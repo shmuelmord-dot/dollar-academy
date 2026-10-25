@@ -46,6 +46,8 @@
         const { useState, useEffect, useRef } = React;
 
         const LS_KEY = 'us-expansion-questionnaire-v1';
+        // כתובת ה-Web App של Google Apps Script — ממלאים אחרי הפריסה (ריק = לא נשלח, רק נשמר מקומית)
+        const SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxGVjiHaBNqRNewM6UEMOs080t1gyD3cGsu5d6YrT0hDB2xXDsuVRBfY4C0qAng0cF9cQ/exec';
 
         // ולידציה לשדות אתר / מייל / טלפון
         function validateField(type, value) {
@@ -244,6 +246,22 @@
             disclaimer: 'המחקר הוא הערכה ראשונית המבוססת על המידע שסופק ועל המקורות שנבדקו. הוא אינו מבטיח תוצאות עסקיות ואינו מחליף ייעוץ משפטי, חשבונאי או מקצועי מתאים.'
         };
 
+        // אוסף את כל התשובות שמולאו למפה קריאה: "טקסט השאלה" → תשובה
+        function collectForSubmit(answers) {
+            const idToLabel = {};
+            SECTIONS.forEach(s => (s.questions || []).forEach(q => { idToLabel[q.id] = q.q; }));
+            Object.keys(TRACKS).forEach(k => TRACKS[k].forEach(q => { idToLabel[q.id] = q.q; }));
+            idToLabel['bizModel'] = 'מודל עסקי';
+            const out = {};
+            Object.keys(answers).forEach(id => {
+                let v = answers[id];
+                if (Array.isArray(v)) v = v.join(', ');
+                if (v === '' || v == null) return;
+                out[idToLabel[id] || id] = v;
+            });
+            return out;
+        }
+
         // ═══════════════ רכיבי שדה ═══════════════
         const Field = ({ q, value, onChange, showErr }) => {
             const base = 'w-full bg-white/5 border-2 text-white rounded-xl p-3.5 text-base outline-none transition-colors';
@@ -329,6 +347,8 @@
             const [step, setStep] = useState(0); // 0 = intro, 1..N = sections, N+1 = outro
             const [loaded, setLoaded] = useState(false);
             const [showErr, setShowErr] = useState(false);
+            const [submitState, setSubmitState] = useState('idle'); // idle | sending | sent | error
+            const submittedRef = useRef(false);
             const topRef = useRef(null);
 
             useEffect(() => {
@@ -337,6 +357,18 @@
             }, []);
             useEffect(() => { if (loaded) { try { localStorage.setItem(LS_KEY, JSON.stringify({ answers, step })); } catch (e) {} } }, [answers, step, loaded]);
             useEffect(() => { setShowErr(false); if (topRef.current) topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [step]);
+
+            // שליחה אוטומטית ל-Google Sheets כשמגיעים לשלב הסיום
+            useEffect(() => {
+                const isLast = step === SECTIONS.length + 1;
+                if (isLast && SHEETS_ENDPOINT && !submittedRef.current) {
+                    submittedRef.current = true;
+                    setSubmitState('sending');
+                    fetch(SHEETS_ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ ts: new Date().toISOString(), data: collectForSubmit(answers) }) })
+                        .then(() => setSubmitState('sent'))
+                        .catch(() => { submittedRef.current = false; setSubmitState('error'); });
+                }
+            }, [step]);
 
             const setAns = (id, val) => setAnswers(a => ({ ...a, [id]: val }));
 
@@ -349,7 +381,13 @@
             const pct = isIntro ? 0 : isOutro ? 100 : Math.round(((sectionIdx + 1) / nSections) * 100);
 
             const go = (d) => setStep(s => Math.max(0, Math.min(totalSteps - 1, s + d)));
-            const restart = () => { if (window.confirm('לאפס את כל התשובות ולהתחיל מחדש?')) { setAnswers({}); setStep(0); try { localStorage.removeItem(LS_KEY); } catch (e) {} } };
+            const restart = () => { if (window.confirm('לאפס את כל התשובות ולהתחיל מחדש?')) { setAnswers({}); setStep(0); setSubmitState('idle'); submittedRef.current = false; try { localStorage.removeItem(LS_KEY); } catch (e) {} } };
+            const retrySubmit = () => {
+                setSubmitState('sending');
+                fetch(SHEETS_ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ ts: new Date().toISOString(), data: collectForSubmit(answers) }) })
+                    .then(() => { submittedRef.current = true; setSubmitState('sent'); })
+                    .catch(() => setSubmitState('error'));
+            };
 
             const trackKey = (() => { const o = TRACK_OPTIONS.find(x => x.label === answers.bizModel); return o ? o.key : null; })();
 
@@ -427,6 +465,13 @@
                                 <div className="flex flex-col gap-6 items-center" style={{ textAlign: 'center' }}>
                                     <h1 className="font-extrabold text-white leading-tight" style={{ fontSize: 'clamp(1.6rem, 6vw, 2.4rem)', textAlign: 'center' }}>{OUTRO.title}</h1>
                                     <p className="text-slate-300 leading-relaxed" style={{ textAlign: 'center' }}>{OUTRO.body}</p>
+                                    {SHEETS_ENDPOINT && (
+                                        <div className="text-sm" style={{ textAlign: 'center' }}>
+                                            {submitState === 'sending' && <span className="text-slate-400">שולח את התשובות…</span>}
+                                            {submitState === 'sent' && <span className="text-[#4ade80] font-semibold">התשובות נשלחו בהצלחה ✓</span>}
+                                            {submitState === 'error' && <span className="text-red-400">לא הצלחנו לשלוח כרגע — התשובות נשמרו במכשיר. <button onClick={retrySubmit} className="underline font-semibold">נסו שוב</button></span>}
+                                        </div>
+                                    )}
                                     <div className="glass-panel rounded-2xl p-4 text-slate-500 text-xs leading-relaxed" style={{ textAlign: 'center' }}>{OUTRO.disclaimer}</div>
                                     <button onClick={restart} className="text-white/50 text-sm hover:text-white transition-colors">מילוי שאלון חדש</button>
                                 </div>
