@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שאלון מיפוי עסקי — התרחבות לשוק האמריקאי</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: { background: '#080f20', highlight: '#5298fa', cta: '#1f73f7' },
+                fontFamily: { sans: ['Heebo', 'sans-serif'] },
+                screens: { 'xs': '375px', 'sm': '640px', 'md': '768px', 'lg': '1024px', 'xl': '1280px' }
+            } }
+        }
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        Babel.registerPreset('react-classic', { presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]] });
+    </script>
+
+    <style>
+        body { background-color: #080f20; color: #fff; min-height: 100vh; overflow-x: hidden; font-family: 'Heebo', sans-serif; }
+        * { unicode-bidi: plaintext; text-align: right; }
+        .glass-panel { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .fade-enter { opacity: 0; transform: translateY(10px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 350ms, transform 350ms; }
+        .cta-glow { box-shadow: 0 0 25px rgba(31,115,247,0.45); }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4) !important; }
+        textarea { resize: vertical; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react-classic">
+        const { useState, useEffect, useRef } = React;
+
+        const LS_KEY = 'us-expansion-questionnaire-v1';
+
+        // ולידציה לשדות אתר / מייל / טלפון
+        function validateField(type, value) {
+            const v = (value == null ? '' : String(value)).trim();
+            if (!v) return null;
+            if (type === 'email') return /^[^\s@]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i.test(v) ? null : 'כתובת מייל לא תקינה (לדוגמה: name@company.com)';
+            if (type === 'tel') { const d = v.replace(/\D/g, ''); return (d.length === 10 && d.startsWith('05')) ? null : 'מספר נייד לא תקין (לדוגמה: 050-1234567)'; }
+            if (type === 'url') return /^(https?:\/\/)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(\/\S*)?$/i.test(v) ? null : 'כתובת אתר לא תקינה (לדוגמה: example.co.il)';
+            return null;
+        }
+
+        // פורמט נייד ישראלי: 05X-XXXXXXX
+        function formatIlPhone(val) {
+            let d = String(val || '').replace(/\D/g, '');
+            if (d.length > 10) d = d.slice(0, 10);
+            return d.length > 3 ? d.slice(0, 3) + '-' + d.slice(3) : d;
+        }
+
+        // ═══════════════ נתוני השאלון ═══════════════
+        // סוגי שדה: short (שורה), long (טקסט ארוך), url, single (בחירה אחת), multi (בחירה מרובה)
+        const INTRO = {
+            title: 'שאלון מיפוי עסקי לקראת התרחבות לשוק האמריקאי',
+            sub: 'מטרת השאלון: להבין את העסק הקיים, המודל העסקי, היכולות ומטרות ההתרחבות לארה״ב — כדי להכין מחקר ואסטרטגיית כניסה ראשונית המותאמים לעסק שלך.',
+            note: 'המילוי לוקח כ-10–15 דקות. ההתקדמות נשמרת אוטומטית — אפשר לעצור ולחזור בכל שלב. אין צורך בדוחות כספיים מלאים; טווחים והערכות מספיקים.'
+        };
+
+        const SECTIONS = [
+            { part: 'פרטי קשר', title: 'מי ממלא את השאלון?', purpose: 'נשתמש בפרטים רק כדי לחזור אליכם עם הממצאים — בלי ספאם. שדות עם כוכבית (*) הם חובה.', questions: [
+                { n: 'שם', id: 'contact_name', t: 'short', q: 'שם מלא', req: true, ac: 'name' },
+                { n: 'תפקיד', id: 'contact_role', t: 'short', q: 'התפקיד שלכם בעסק', ac: 'organization-title' },
+                { n: 'מייל', id: 'contact_email', t: 'email', q: 'כתובת מייל', req: true, p: 'name@company.com', ac: 'email' },
+                { n: 'נייד', id: 'contact_phone', t: 'tel', q: 'מספר נייד', req: true, p: '050-1234567', ac: 'tel' },
+            ]},
+            { part: 'חלק 1', title: 'פרטים כלליים על העסק', purpose: 'מי העסק, מה הוא עושה, באיזה שלב הוא נמצא ומי מקבל את ההחלטות.', questions: [
+                { n: 1, id: 'q1', t: 'short', q: 'מה שם העסק?' },
+                { n: 2, id: 'q2', t: 'url', q: 'מה כתובת האתר של העסק?', p: 'https://example.co.il', ac: 'url' },
+                { n: 3, id: 'q3', t: 'long', q: 'אילו קישורים נוספים אפשר להתרשם מהעסק?', p: 'רשתות חברתיות, קטלוג, תיק עבודות, חנות אונליין…' },
+                { n: 4, id: 'q4', t: 'short', q: 'באיזו שנה העסק הוקם?' },
+                { n: 5, id: 'q5', t: 'short', q: 'באילו מדינות או אזורים העסק פועל כיום?' },
+                { n: 6, id: 'q6', t: 'short', q: 'מה התחום המרכזי שבו העסק פועל?' },
+                { n: 7, id: 'q7', t: 'short', q: 'איך היית מתאר את העסק במשפט אחד?' },
+                { n: 8, id: 'q8', t: 'single', q: 'מהו המבנה המשפטי של העסק?', o: ['עצמאי', 'חברה בע״מ', 'שותפות', 'מבנה אחר'] },
+                { n: 9, id: 'q9', t: 'short', q: 'מי יהיו מקבלי ההחלטות בנוגע להתרחבות לארה״ב?' },
+            ]},
+            { part: 'חלק 2', title: 'המוצר או השירות', purpose: 'מה בדיוק העסק מוכר, איזה ערך הוא מספק ומה אפשר להעביר לשוק האמריקאי.', questions: [
+                { n: 10, id: 'q10', t: 'long', q: 'מהם המוצרים או השירותים המרכזיים שהעסק מוכר כיום?' },
+                { n: 11, id: 'q11', t: 'short', q: 'איזה מוצר או שירות הוא החשוב ביותר מבחינת הכנסות?' },
+                { n: 12, id: 'q12', t: 'long', q: 'מה בדיוק הלקוח מקבל כשהוא קונה מכם?' },
+                { n: 13, id: 'q13', t: 'long', q: 'איזו בעיה מרכזית אתם פותרים עבור הלקוחות?' },
+                { n: 14, id: 'q14', t: 'long', q: 'מה התוצאה שהלקוחות מצפים לקבל מכם?' },
+                { n: '15 + 16', id: 'q15', t: 'long', q: 'מה מבדל אתכם מהמתחרים, ולמה לקוחות בוחרים דווקא בכם ולא באלטרנטיבות?' },
+                { n: 17, id: 'q17', t: 'short', q: 'מה טווח המחירים של המוצרים או השירותים שלכם?' },
+                { n: 18, id: 'q18', t: 'single', q: 'איך בנוי התמחור?', o: ['חד־פעמי', 'חודשי', 'לפי פרויקט', 'לפי שימוש', 'מודל אחר'] },
+                { n: 19, id: 'q19', t: 'long', q: 'האם יש לכם חבילות או מסלולי שירות שונים? פרטו.' },
+                { n: 20, id: 'q20', t: 'short', q: 'כמה זמן לוקח בדרך כלל לספק את המוצר או השירות?' },
+                { n: 21, id: 'q21', t: 'single', q: 'האם אפשר לספק את המוצר/שירות ללקוח אמריקאי בלי לשנות את אופן העבודה הקיים?', o: ['כן, בלי שינוי', 'דרושות התאמות', 'לא'] },
+                { n: 22, id: 'q22', t: 'long', q: 'אילו התאמות לדעתכם יידרשו כדי למכור אותו בארה״ב?' },
+                { n: 23, id: 'q23', t: 'long', q: 'אילו נתונים מוכיחים את איכות המוצר/שירות?', p: 'תוצאות לקוחות, שיעורי שימור, המלצות, מקרי בוחן, נתוני שימוש…' },
+                { n: 'עומק', id: 'q_depth2', t: 'long', depth: true, q: 'אם היית צריך להסביר ללקוח אמריקאי מדוע כדאי לו לבחור בכם במקום בספק מקומי — מה הייתה הסיבה המרכזית?' },
+            ]},
+            { part: 'חלק 3', title: 'לקוחות קיימים והוכחת ביקוש', purpose: 'מי קונה היום, מדוע הוא קונה ומה כבר הוכח במודל העסקי.', questions: [
+                { n: '24 + 27', id: 'q24', t: 'long', q: 'מי הלקוח האידיאלי שלכם, ומה מאפיין את הלקוחות הטובים ביותר שיש לכם היום?' },
+                { n: 25, id: 'q25', t: 'single', q: 'למי אתם מוכרים?', o: ['עסקים (B2B)', 'צרכנים פרטיים (B2C)', 'שניהם', 'מגזר אחר'], hint: 'התשובה כאן עוזרת להתאים את החלק הייעודי בהמשך.' },
+                { n: 26, id: 'q26', t: 'long', q: 'באילו ענפים או סוגי לקוחות אתם מתמחים?' },
+                { n: 28, id: 'q28', t: 'short', q: 'מהו גודל הלקוח הטיפוסי שלכם (אם מדובר בעסקים)?' },
+                { n: 29, id: 'q29', t: 'long', q: 'מהי הסיבה העיקרית שלקוחות קונים מכם?' },
+                { n: 30, id: 'q30', t: 'long', q: 'מהן ההתנגדויות הנפוצות לפני רכישה?' },
+                { n: 31, id: 'q31', t: 'short', q: 'כמה לקוחות משלמים פעילים יש לכם כיום?' },
+                { n: 32, id: 'q32', t: 'short', q: 'כמה לקוחות חדשים אתם רוכשים בחודש בממוצע?' },
+                { n: '33 + 35', id: 'q33', t: 'short', q: 'מהו שיעור הלקוחות החוזרים, וכמה זמן לקוח נשאר אתכם בממוצע? (אם רלוונטי)' },
+                { n: 34, id: 'q34', t: 'single', q: 'מהיכן מגיעות רוב ההכנסות?', o: ['ממספר קטן של לקוחות', 'ממספר גדול של לקוחות', 'מעורב'] },
+                { n: 36, id: 'q36', t: 'long', q: 'אילו מקרי בוחן או המלצות אפשר להציג ללקוחות בארה״ב?' },
+                { n: 37, id: 'q37', t: 'long', q: 'האם כבר מכרתם ללקוחות מחוץ לישראל? אם כן — באילו מדינות ומה למדתם מכך?' },
+            ]},
+            { part: 'חלק 4', title: 'מצב עסקי ופיננסי', purpose: 'היציבות העסקית, יכולת ההשקעה והמגבלות הכלכליות של ההתרחבות. טווחים מספיקים.', questions: [
+                { n: 38, id: 'q38', t: 'single', q: 'מהו מחזור ההכנסות החודשי הממוצע כיום?', o: ['פחות מ־50 אלף ₪', '50–150 אלף ₪', '150–300 אלף ₪', '300–750 אלף ₪', 'מעל 750 אלף ₪', 'מעדיף לא לציין'] },
+                { n: 39, id: 'q39', t: 'single', q: 'כיצד השתנו ההכנסות ב־12 החודשים האחרונים?', o: ['צמיחה משמעותית', 'צמיחה מתונה', 'יציבות', 'ירידה', 'עסק חדש מכדי להעריך'] },
+                { n: 40, id: 'q40', t: 'short', q: 'מהו שיעור הרווחיות הגולמית המשוער (אם ידוע)?' },
+                { n: 41, id: 'q41', t: 'single', q: 'האם העסק רווחי כיום?', o: ['כן', 'לא', 'בקירוב / משתנה'] },
+                { n: 42, id: 'q42', t: 'long', q: 'מהן ההוצאות או העלויות המרכזיות שמגבילות את הצמיחה?' },
+                { n: 43, id: 'q43', t: 'single', q: 'האם יש תזרים מזומנים שמאפשר השקעה בפרויקט התרחבות?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 44, id: 'q44', t: 'single', q: 'כיצד תמומן ההתרחבות לארה״ב?', o: ['מתזרים קיים', 'מהון שהוקצה מראש', 'ממקור אחר'] },
+                { n: 45, id: 'q45', t: 'single', q: 'מהו סדר הגודל של התקציב להקמת הפעילות בארה״ב (מעבר לעלות המחקר והתכנון)?', o: ['עד 25 אלף ₪', '25–75 אלף ₪', '75–150 אלף ₪', '150–300 אלף ₪', 'מעל 300 אלף ₪', 'עדיין לא הוגדר תקציב'] },
+                { n: 46, id: 'q46', t: 'long', q: 'האם יש מגבלה כספית או תזרימית שחשוב להביא בחשבון?' },
+            ]},
+            { part: 'חלק 5', title: 'שיווק ומכירות כיום', purpose: 'כיצד העסק רוכש לקוחות, אילו ערוצים עובדים ומה ניתן להתאים לשוק האמריקאי.', questions: [
+                { n: 47, id: 'q47', t: 'multi', q: 'מהם ערוצי השיווק העיקריים שלכם כיום? (אפשר לבחור כמה)', o: ['פרסום ממומן', 'קידום אורגני במנועי חיפוש', 'תוכן ורשתות חברתיות', 'שיתופי פעולה והפניות', 'צוות מכירות יזום', 'מכירות דרך שותפים או מפיצים', 'מכירות בחנויות או בנקודות מכירה', 'ערוצים אחרים'] },
+                { n: 48, id: 'q48', t: 'long', q: 'איזה ערוץ מביא לכם כיום את הלקוחות האיכותיים ביותר?' },
+                { n: 49, id: 'q49', t: 'long', q: 'האם אתם יודעים כמה עולה לכם בממוצע לרכוש לקוח חדש? אם כן — כמה?' },
+                { n: 50, id: 'q50', t: 'long', q: 'מהו תהליך המכירה שלכם, מהפנייה הראשונה ועד סגירת העסקה?' },
+                { n: 51, id: 'q51', t: 'short', q: 'כמה זמן נמשכת עסקה ממוצעת?' },
+                { n: 52, id: 'q52', t: 'short', q: 'מי אחראי כיום על המכירות?' },
+                { n: 53, id: 'q53', t: 'long', q: 'האם יש תסריטי מכירה, תהליך מעקב, CRM או מערכת מסודרת לניהול לקוחות?' },
+                { n: 54, id: 'q54', t: 'single', q: 'האם יש אתר או דפי נחיתה שמייצרים פניות?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 55, id: 'q55', t: 'short', q: 'באילו שפות אתם משווקים ומוכרים כיום?' },
+                { n: 56, id: 'q56', t: 'long', q: 'האם כבר ניסיתם לשווק את העסק לקהל אמריקאי? מה עשיתם ומה היו התוצאות?' },
+                { n: 57, id: 'q57', t: 'long', q: 'אילו נכסים שיווקיים כבר קיימים וניתן להשתמש בהם או להתאים לארה״ב?' },
+            ]},
+            { part: 'חלק 6', title: 'תפעול ויכולת לספק בארה״ב', purpose: 'האם העסק יכול לשרת את השוק האמריקאי בפועל, ולא רק למכור אליו.', questions: [
+                { n: 58, id: 'q58', t: 'long', q: 'כיצד העסק מספק כיום את המוצר או השירות?' },
+                { n: 59, id: 'q59', t: 'single', q: 'האם אפשר לספק אותו מרחוק, או שנדרשת נוכחות פיזית?', o: ['מרחוק לגמרי', 'דרושה נוכחות פיזית', 'משולב'] },
+                { n: 60, id: 'q60', t: 'single', q: 'האם העסק תלוי בבעלים לצורך מכירות, אספקה או ניהול שוטף?', o: ['כן, תלוי בבעלים', 'לא', 'חלקית'] },
+                { n: 61, id: 'q61', t: 'single', q: 'האם יש תהליכי עבודה מתועדים שאפשר להעביר לעובדים נוספים?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 62, id: 'q62', t: 'long', q: 'האם תידרשו לגייס עובדים, קבלנים, נציגי מכירות או שותפים בארה״ב? אם כן — לאילו תפקידים?' },
+                { n: 63, id: 'q63', t: 'single', q: 'האם נדרשת תמיכה בשעות העבודה האמריקאיות?', o: ['כן', 'לא', 'לא בטוח'] },
+                { n: '64 + 65', id: 'q64', t: 'long', q: 'אילו דרישות רגולטוריות (רישוי, ביטוח, תקינה, פרטיות, יבוא) או חסמים אחרים (לוגיסטיים, טכנולוגיים, משפטיים) ידועים לכם שעלולים להשפיע על הפעילות בארה״ב?' },
+                { n: 66, id: 'q66', t: 'long', q: 'אילו חלקים בעסק חייבים להישאר בישראל, ואילו אפשר להעביר לארה״ב או להפעיל מרחוק?' },
+            ]},
+            { part: 'חלק 7', title: 'שאלות לפי סוג העסק', purpose: 'בוחרים את המסלול שמתאר הכי טוב את המודל העסקי — ועונים רק על השאלות הרלוונטיות אליו.', isTrack: true, questions: [] },
+            { part: 'חלק 8', title: 'היעדים בשוק האמריקאי', purpose: 'מה בעל העסק רוצה להשיג, מה כבר נעשה ומהי האסטרטגיה האפשרית.', questions: [
+                { n: 74, id: 'q74', t: 'long', q: 'למה אתם רוצים להתרחב לארה״ב דווקא עכשיו?' },
+                { n: 75, id: 'q75', t: 'single', q: 'מהי המטרה המרכזית של ההתרחבות?', o: ['מקור הכנסה נוסף', 'הגדלת היקף המכירות', 'כניסה לשוק גדול יותר', 'פיזור סיכונים בין מדינות', 'פתיחת פעילות פיזית בארה״ב', 'גיוס לקוחות או שותפים אסטרטגיים', 'מטרה אחרת'] },
+                { n: 76, id: 'q76', t: 'short', q: 'איזה מוצר או שירות תרצו להשיק בארה״ב ראשון?' },
+                { n: 77, id: 'q77', t: 'long', q: 'האם יש אזור, מדינה או עיר בארה״ב שמעניינים אתכם? מדוע?' },
+                { n: 78, id: 'q78', t: 'long', q: 'מי לדעתכם הלקוח האמריקאי האידיאלי?' },
+                { n: 79, id: 'q79', t: 'long', q: 'האם כבר ביצעתם מחקר שוק או שוחחתם עם לקוחות פוטנציאליים בארה״ב?' },
+                { n: 80, id: 'q80', t: 'long', q: 'האם יש לכם לקוחות, שותפים, ספקים או קשרים עסקיים בארה״ב?' },
+                { n: 81, id: 'q81', t: 'long', q: 'האם יש לכם חברה אמריקאית, חשבון בנק עסקי, תשתית תשלומים או נכסים עסקיים אחרים בארה״ב?' },
+                { n: 82, id: 'q82', t: 'single', q: 'כיצד אתם מתכננים לפעול?', o: ['מרחוק מישראל', 'הקמת צוות בארה״ב', 'דרך שותפים', 'שילוב של כמה מודלים'] },
+                { n: 83, id: 'q83', t: 'short', q: 'מהו יעד ההכנסות או היקף הפעילות שאתם שואפים אליו בארה״ב?' },
+                { n: 84, id: 'q84', t: 'single', q: 'בתוך כמה זמן הייתם רוצים להתחיל למכור ללקוחות אמריקאים?', o: ['מיידית', 'בתוך 1–3 חודשים', 'בתוך 3–6 חודשים', 'בתוך 6–12 חודשים', 'עדיין לא בטוח'] },
+                { n: 85, id: 'q85', t: 'long', q: 'מה ייחשב מבחינתכם הצלחה בשנה הראשונה?' },
+                { n: 86, id: 'q86', t: 'long', q: 'מהו החשש הגדול ביותר שלכם בנוגע לכניסה לשוק האמריקאי?' },
+            ]},
+            { part: 'חלק 9', title: 'מוכנות לביצוע והעדפות', purpose: 'מה הלקוח מוכן לעשות, מה הוא מצפה לקבל ומה נדרש כדי שהאסטרטגיה תהיה ישימה.', questions: [
+                { n: 87, id: 'q87', t: 'long', q: 'אילו צעדים כבר ביצעתם לקראת ההתרחבות?' },
+                { n: 88, id: 'q88', t: 'long', q: 'מה מנע מכם להתקדם עד היום?' },
+                { n: 89, id: 'q89', t: 'single', q: 'מהו החסם המרכזי כרגע?', o: ['חוסר ידע על השוק', 'חוסר ודאות לגבי הביקוש', 'קושי לבחור אזור או קהל יעד', 'תשתיות עסקיות או משפטיות', 'שיווק ומכירות', 'כוח אדם ותפעול', 'תקציב', 'חוסר זמן', 'חסם אחר'] },
+                { n: 90, id: 'q90', t: 'short', q: 'מי יוביל את פרויקט ההתרחבות מתוך העסק?' },
+                { n: 91, id: 'q91', t: 'single', q: 'כמה זמן הנהלת העסק יכולה להקדיש לתהליך מדי שבוע?', o: ['עד 5 שעות', '5–10 שעות', '10–20 שעות', 'מעל 20 שעות'] },
+                { n: 92, id: 'q92', t: 'single', q: 'איך הייתם רוצים לבצע את ההקמה?', o: ['רוב העבודה בעצמנו', 'להיעזר באנשי מקצוע נקודתיים', 'להעביר את ההקמה לגורם חיצוני'] },
+                { n: 93, id: 'q93', t: 'long', q: 'אילו תחומים הייתם מעדיפים שמישהו אחר יטפל בהם?' },
+                { n: 94, id: 'q94', t: 'long', q: 'האם קיימת מגבלה על השקעת זמן, הון או משאבים שחשוב להכיר?' },
+                { n: 95, id: 'q95', t: 'long', q: 'האם יש תאריך יעד או אירוע עסקי שמחייב אתכם להתקדם עד מועד מסוים?' },
+                { n: 96, id: 'q96', t: 'long', q: 'מה חשוב לכם לקבל מהפגישה האסטרטגית שלנו?' },
+            ]},
+        ];
+
+        // מסלולי חלק 7 — מוצג רק המסלול שנבחר
+        const TRACK_OPTIONS = [
+            { key: 'A', label: 'שירותים, סוכנות או ייעוץ' },
+            { key: 'B', label: 'מסחר אלקטרוני / מוצרים פיזיים' },
+            { key: 'C', label: 'SaaS / תוכנה' },
+            { key: 'D', label: 'שירותים פיזיים / מקומיים' },
+            { key: 'E', label: 'יצרן, מפיץ או B2B' },
+            { key: 'F', label: 'מודל עסקי אחר' },
+        ];
+        const TRACKS = {
+            A: [
+                { n: 'A67', id: 'a67', t: 'long', q: 'אילו שירותים אתם מספקים, ומה בדיוק כלול בכל שירות?' },
+                { n: 'A69', id: 'a69', t: 'single', q: 'האם יש יכולת לתת שירות באנגלית ובשעות המתאימות ללקוחות אמריקאים?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 'A70', id: 'a70', t: 'short', q: 'מהו שווי העסקה הממוצעת ומהי תקופת ההתקשרות הטיפוסית?' },
+            ],
+            B: [
+                { n: 'B68', id: 'b68', t: 'single', q: 'איך אתם מקבלים את המוצר?', o: ['מייצרים בעצמנו', 'עובדים עם יצרן', 'רוכשים מספקים'] },
+                { n: 'B69', id: 'b69', t: 'short', q: 'מהי העלות הכוללת של המוצר לפני משלוח, אחסון ושיווק?' },
+                { n: 'B70', id: 'b70', t: 'long', q: 'מהן מגבלות הייצור או המלאי שלכם?' },
+                { n: 'B71', id: 'b71', t: 'long', q: 'האם יש ניסיון בשילוח בינלאומי, החזרות, שירות לקוחות ומכס?' },
+                { n: 'B72', id: 'b72', t: 'single', q: 'האם המוצרים דורשים תקינה, אישורים או תוויות מיוחדות בארה״ב?', o: ['כן', 'לא', 'לא בטוח'] },
+                { n: 'B73', id: 'b73', t: 'long', q: 'האם קיימים סימני מסחר, פטנטים או זכויות אחרות שחשוב להגן עליהם?' },
+            ],
+            C: [
+                { n: 'C70', id: 'c70', t: 'short', q: 'מהו שיעור הנטישה (churn), אם אתם מודדים אותו?' },
+                { n: 'C71', id: 'c71', t: 'single', q: 'האם המוצר תומך באנגלית, במטבע דולר ובאמצעי תשלום מתאימים?', o: ['כן, בכל', 'חלקית', 'עדיין לא'] },
+                { n: 'C72', id: 'c72', t: 'long', q: 'אילו התאמות נדרשות לאבטחת מידע, פרטיות, אינטגרציות או דרישות של לקוחות אמריקאיים?' },
+                { n: 'C73', id: 'c73', t: 'single', q: 'האם יש יכולת לספק תמיכה והטמעה ללקוחות בארה״ב?', o: ['כן', 'לא', 'חלקית'] },
+            ],
+            D: [
+                { n: 'D68', id: 'd68', t: 'short', q: 'באילו אזורים ניתן להפעיל את השירות מבחינה תפעולית?' },
+                { n: 'D69', id: 'd69', t: 'single', q: 'האם נדרשים רישיונות, ביטוחים או בעלי מקצוע מוסמכים?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 'D70', id: 'd70', t: 'long', q: 'האם העסק דורש עובדים מקומיים, ציוד, כלי רכב או מלאי?' },
+                { n: 'D71', id: 'd71', t: 'short', q: 'מהו שווי העבודה הממוצעת ומהן העלויות הישירות לביצועה?' },
+                { n: 'D72', id: 'd72', t: 'long', q: 'כיצד אתם מנהלים היום תיאום, הגעה ללקוחות, בקרת איכות ושירות?' },
+                { n: 'D73', id: 'd73', t: 'single', q: 'האם יש מודל שניתן לשכפל לאזור חדש?', o: ['כן', 'לא', 'חלקית'] },
+            ],
+            E: [
+                { n: 'E68', id: 'e68', t: 'short', q: 'מי מקבל את החלטת הרכישה אצל הלקוחות שלכם?' },
+                { n: 'E69', id: 'e69', t: 'short', q: 'מהו מחזור המכירה הטיפוסי ומהו שווי החוזה הממוצע?' },
+                { n: 'E70', id: 'e70', t: 'single', q: 'איך אתם מוכרים?', o: ['ישירות', 'דרך מפיצים', 'דרך נציגים', 'דרך שותפים'] },
+                { n: 'E71', id: 'e71', t: 'single', q: 'האם יש יכולת לספק כמויות, תמיכה ושירות בהתאם לביקוש אמריקאי?', o: ['כן', 'לא', 'חלקית'] },
+                { n: 'E72', id: 'e72', t: 'long', q: 'אילו דרישות תקינה, יבוא, אחריות או חוזים רלוונטיות למוצר?' },
+                { n: 'E73', id: 'e73', t: 'long', q: 'האם קיימים קשרים עסקיים או ערוצי הפצה שאפשר להרחיב לשוק האמריקאי?' },
+            ],
+            F: [
+                { n: 'F', id: 'f67', t: 'long', q: 'תארו כיצד העסק מייצר הכנסות, מי הלקוחות, כיצד המוצר מסופק ומה נדרש כדי למכור אותו בארה״ב.', p: 'כמה שיותר פירוט יעזור לנו להכין מחקר מדויק.' },
+            ],
+        };
+
+        const OUTRO = {
+            title: 'תודה שמילאתם את השאלון 🎯',
+            body: 'המידע ישמש את הצוות כדי להבין את העסק, לבצע מחקר ראשוני ולגבש כיוונים אפשריים להתרחבות לארה״ב. במסגרת הפגישה האסטרטגית נציג את הממצאים, נדון בהזדמנויות ובפערים ונבחן את הצעדים הבאים.',
+            disclaimer: 'המחקר הוא הערכה ראשונית המבוססת על המידע שסופק ועל המקורות שנבדקו. הוא אינו מבטיח תוצאות עסקיות ואינו מחליף ייעוץ משפטי, חשבונאי או מקצועי מתאים.'
+        };
+
+        // ═══════════════ רכיבי שדה ═══════════════
+        const Field = ({ q, value, onChange, showErr }) => {
+            const base = 'w-full bg-white/5 border-2 text-white rounded-xl p-3.5 text-base outline-none transition-colors';
+            const okBorder = 'border-white/15 focus:border-cta';
+            const [touched, setTouched] = useState(false);
+            if (q.t === 'single') {
+                return (
+                    <div className="flex flex-col gap-2.5">
+                        {q.o.map((opt, i) => {
+                            const sel = value === opt;
+                            return (
+                                <button key={i} onClick={() => onChange(opt)} className={`w-full px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.99] ${sel ? 'border-cta bg-cta/20 text-white font-semibold' : 'border-white/15 bg-white/5 text-slate-200 hover:border-white/30'}`} style={{ textAlign: 'right' }}>
+                                    <span className="inline-flex items-center gap-2.5">
+                                        <span className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center text-[11px] ${sel ? 'border-cta bg-cta text-white' : 'border-white/30'}`}>{sel ? '✓' : ''}</span>
+                                        {opt}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                );
+            }
+            if (q.t === 'multi') {
+                const arr = Array.isArray(value) ? value : [];
+                const toggle = (opt) => onChange(arr.includes(opt) ? arr.filter(x => x !== opt) : [...arr, opt]);
+                return (
+                    <div className="flex flex-col gap-2.5">
+                        {q.o.map((opt, i) => {
+                            const sel = arr.includes(opt);
+                            return (
+                                <button key={i} onClick={() => toggle(opt)} className={`w-full px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.99] ${sel ? 'border-cta bg-cta/20 text-white font-semibold' : 'border-white/15 bg-white/5 text-slate-200 hover:border-white/30'}`} style={{ textAlign: 'right' }}>
+                                    <span className="inline-flex items-center gap-2.5">
+                                        <span className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center text-[11px] ${sel ? 'border-cta bg-cta text-white' : 'border-white/30'}`}>{sel ? '✓' : ''}</span>
+                                        {opt}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                );
+            }
+            const reqEmpty = q.req && !String(value || '').trim();
+            const errId = q.id + '-err';
+            if (q.t === 'long') {
+                const lErr = showErr && reqEmpty;
+                return (
+                    <div>
+                        <textarea id={q.id} name={q.id} rows="3" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={q.p || ''} aria-required={!!q.req} aria-invalid={!!lErr} aria-describedby={lErr ? errId : undefined} className={`${base} ${lErr ? 'border-red-500' : okBorder}`} style={{ textAlign: 'right' }} />
+                        {lErr && <div id={errId} role="alert" className="mt-1.5 inline-block bg-red-500 text-white text-[11px] font-bold px-2.5 py-1 rounded">שדה חובה</div>}
+                    </div>
+                );
+            }
+            // short / url / email / tel
+            const isLtr = q.t === 'url' || q.t === 'email' || q.t === 'tel';
+            const htmlType = q.t === 'email' ? 'email' : q.t === 'tel' ? 'tel' : q.t === 'url' ? 'url' : 'text';
+            const imode = q.t === 'email' ? 'email' : q.t === 'tel' ? 'tel' : q.t === 'url' ? 'url' : 'text';
+            const fmtErr = validateField(q.t, value);
+            const err = (showErr && reqEmpty) ? 'שדה חובה' : ((touched || showErr) ? fmtErr : null);
+            return (
+                <div style={isLtr ? { direction: 'ltr', textAlign: 'left' } : undefined}>
+                    <input id={q.id} name={q.id} type={htmlType} inputMode={imode} autoComplete={q.ac || undefined} value={value || ''} onChange={e => onChange(q.t === 'tel' ? formatIlPhone(e.target.value) : e.target.value)} onBlur={() => setTouched(true)} placeholder={q.p || ''} aria-required={!!q.req} aria-invalid={!!err} aria-describedby={err ? errId : undefined} className={`${base} ${err ? 'border-red-500' : okBorder}`} style={isLtr ? { direction: 'ltr', textAlign: 'left' } : { textAlign: 'right' }} />
+                    {err && <div id={errId} role="alert" className="mt-1.5 inline-block bg-red-500 text-white text-[11px] font-bold px-2.5 py-1 rounded">{err}</div>}
+                </div>
+            );
+        };
+
+        const QuestionBlock = ({ q, value, onChange, showErr }) => (
+            <div className={`rounded-2xl p-5 ${q.depth ? 'border-2 border-[#fbbf24]/40 bg-[#fbbf24]/[0.06]' : 'glass-panel'}`}>
+                <label htmlFor={q.id} className="block mb-3" style={{ textAlign: 'right' }}>
+                    <span className={`inline-block text-xs font-bold px-2 py-0.5 rounded-md ml-2 ${q.depth ? 'bg-[#fbbf24] text-black' : 'bg-cta/25 text-highlight'}`}>{q.depth ? 'שאלת עומק' : q.n}</span>
+                    <span className="text-white font-semibold text-base md:text-lg leading-snug">{q.q}</span>
+                    {q.req && <span className="text-red-400 font-bold mr-1" aria-hidden="true">*</span>}
+                    {q.req && <span className="sr-only"> (שדה חובה)</span>}
+                    {q.hint && <span className="block text-slate-400 text-xs mt-1">{q.hint}</span>}
+                </label>
+                <Field q={q} value={value} onChange={onChange} showErr={showErr} />
+            </div>
+        );
+
+        // ═══════════════ האפליקציה ═══════════════
+        function App() {
+            const [answers, setAnswers] = useState({});
+            const [step, setStep] = useState(0); // 0 = intro, 1..N = sections, N+1 = outro
+            const [loaded, setLoaded] = useState(false);
+            const [showErr, setShowErr] = useState(false);
+            const topRef = useRef(null);
+
+            useEffect(() => {
+                try { const raw = localStorage.getItem(LS_KEY); if (raw) { const d = JSON.parse(raw); setAnswers(d.answers || {}); setStep(typeof d.step === 'number' ? d.step : 0); } } catch (e) {}
+                setLoaded(true);
+            }, []);
+            useEffect(() => { if (loaded) { try { localStorage.setItem(LS_KEY, JSON.stringify({ answers, step })); } catch (e) {} } }, [answers, step, loaded]);
+            useEffect(() => { setShowErr(false); if (topRef.current) topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [step]);
+
+            const setAns = (id, val) => setAnswers(a => ({ ...a, [id]: val }));
+
+            const nSections = SECTIONS.length;
+            const totalSteps = nSections + 2;
+            const isIntro = step === 0;
+            const isOutro = step === totalSteps - 1;
+            const sectionIdx = step - 1; // valid when 1..nSections
+            const section = (!isIntro && !isOutro) ? SECTIONS[sectionIdx] : null;
+            const pct = isIntro ? 0 : isOutro ? 100 : Math.round(((sectionIdx + 1) / nSections) * 100);
+
+            const go = (d) => setStep(s => Math.max(0, Math.min(totalSteps - 1, s + d)));
+            const restart = () => { if (window.confirm('לאפס את כל התשובות ולהתחיל מחדש?')) { setAnswers({}); setStep(0); try { localStorage.removeItem(LS_KEY); } catch (e) {} } };
+
+            const trackKey = (() => { const o = TRACK_OPTIONS.find(x => x.label === answers.bizModel); return o ? o.key : null; })();
+
+            const sectionFields = (() => {
+                if (!section) return [];
+                if (section.isTrack) return trackKey && TRACKS[trackKey] ? TRACKS[trackKey] : [];
+                return section.questions;
+            })();
+            const sectionHasError = sectionFields.some(q => {
+                const val = answers[q.id];
+                if (q.req && !String(val || '').trim()) return true;
+                return !!validateField(q.t, val);
+            });
+            const handleNext = () => { if (sectionHasError) { setShowErr(true); return; } go(1); };
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    {/* Header + progress */}
+                    <header ref={topRef} className="sticky top-0 z-20 bg-[#080f20]/90 backdrop-blur border-b border-white/10 px-4 py-3">
+                        <div className="max-w-2xl mx-auto">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-slate-400 text-xs">{isIntro ? 'מבוא' : isOutro ? 'סיום' : `${section.part} · שלב ${sectionIdx + 1} מתוך ${nSections}`}</span>
+                                <span className="text-slate-500 text-[11px]">נשמר אוטומטית ✓</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-cta transition-all duration-400 ease-out" style={{ width: `${pct}%` }}></div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="flex-grow px-4 py-8">
+                        <div key={step} className="max-w-2xl mx-auto fade-enter fade-enter-active">
+                            {isIntro && (
+                                <div className="flex flex-col gap-6" style={{ textAlign: 'center' }}>
+                                    <h1 className="font-extrabold text-white leading-tight" style={{ fontSize: 'clamp(1.6rem, 6vw, 2.4rem)', textAlign: 'center' }}>{INTRO.title}</h1>
+                                    <p className="text-slate-300 leading-relaxed" style={{ textAlign: 'center' }}>{INTRO.sub}</p>
+                                    <div className="glass-panel rounded-2xl p-4 text-slate-400 text-sm leading-relaxed" style={{ textAlign: 'center' }}>{INTRO.note}</div>
+                                    <button onClick={() => go(1)} className="cta-glow bg-cta text-white font-extrabold text-lg py-4 rounded-full w-full active:scale-95 transition-all" style={{ textAlign: 'center' }}>בוא נתחיל ←</button>
+                                    {Object.keys(answers).length > 0 && <button onClick={restart} className="text-white/40 text-xs hover:text-white/70 transition-colors">איפוס והתחלה מחדש</button>}
+                                </div>
+                            )}
+
+                            {section && (
+                                <div className="flex flex-col gap-5">
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div className="text-highlight font-extrabold text-sm tracking-widest mb-1">{section.part}</div>
+                                        <h2 className="font-extrabold text-white leading-tight" style={{ fontSize: 'clamp(1.4rem, 5.5vw, 2rem)', textAlign: 'right' }}>{section.title}</h2>
+                                        <p className="text-slate-400 text-sm mt-2 leading-relaxed">{section.purpose}</p>
+                                    </div>
+
+                                    {!section.isTrack && section.questions.map(q => (
+                                        <QuestionBlock key={q.id} q={q} value={answers[q.id]} onChange={v => setAns(q.id, v)} showErr={showErr} />
+                                    ))}
+
+                                    {section.isTrack && (
+                                        <>
+                                            <div className="glass-panel rounded-2xl p-5">
+                                                <label className="block text-white font-semibold text-base md:text-lg mb-3" style={{ textAlign: 'right' }}>מה מתאר הכי טוב את המודל העסקי שלכם?</label>
+                                                <Field q={{ t: 'single', o: TRACK_OPTIONS.map(x => x.label) }} value={answers.bizModel} onChange={v => setAns('bizModel', v)} />
+                                            </div>
+                                            {trackKey && (
+                                                <div className="flex flex-col gap-4 fade-enter fade-enter-active">
+                                                    <div className="text-slate-400 text-xs border-r-2 border-cta pr-3">שאלות למסלול: {TRACK_OPTIONS.find(x => x.key === trackKey).label}</div>
+                                                    {TRACKS[trackKey].map(q => (
+                                                        <QuestionBlock key={q.id} q={q} value={answers[q.id]} onChange={v => setAns(q.id, v)} showErr={showErr} />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {isOutro && (
+                                <div className="flex flex-col gap-6 items-center" style={{ textAlign: 'center' }}>
+                                    <h1 className="font-extrabold text-white leading-tight" style={{ fontSize: 'clamp(1.6rem, 6vw, 2.4rem)', textAlign: 'center' }}>{OUTRO.title}</h1>
+                                    <p className="text-slate-300 leading-relaxed" style={{ textAlign: 'center' }}>{OUTRO.body}</p>
+                                    <div className="glass-panel rounded-2xl p-4 text-slate-500 text-xs leading-relaxed" style={{ textAlign: 'center' }}>{OUTRO.disclaimer}</div>
+                                    <button onClick={restart} className="text-white/50 text-sm hover:text-white transition-colors">מילוי שאלון חדש</button>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    {/* Nav */}
+                    {!isIntro && (
+                        <footer className="sticky bottom-0 z-20 bg-[#080f20]/95 backdrop-blur border-t border-white/10 px-4 py-3">
+                            <div className="max-w-2xl mx-auto">
+                                {showErr && sectionHasError && <div className="mb-2 text-red-400 text-xs font-semibold" style={{ textAlign: 'center' }}>יש להשלים את שדות החובה ולתקן שגיאות כדי להמשיך</div>}
+                                <div className="flex items-center gap-3">
+                                    <button onClick={() => go(-1)} className="flex-1 py-3.5 rounded-full border-2 border-white/15 text-white/80 font-semibold hover:border-white/30 transition-all" style={{ textAlign: 'center' }}>הקודם</button>
+                                    {!isOutro && <button onClick={handleNext} className="flex-[2] cta-glow bg-cta text-white font-extrabold py-3.5 rounded-full active:scale-95 transition-all" style={{ textAlign: 'center' }}>{sectionIdx + 1 === nSections ? 'סיום ←' : 'המשך ←'}</button>}
+                                </div>
+                            </div>
+                        </footer>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
