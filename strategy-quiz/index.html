@@ -253,6 +253,9 @@
             Object.keys(TRACKS).forEach(k => TRACKS[k].forEach(q => { idToLabel[q.id] = q.q; }));
             idToLabel['bizModel'] = 'מודל עסקי';
             const out = {};
+            let isTest = false;
+            try { isTest = new URLSearchParams(location.search).has('test'); } catch (e) {}
+            out['סוג רשומה'] = isTest ? 'בדיקה' : 'ליד';
             Object.keys(answers).forEach(id => {
                 let v = answers[id];
                 if (Array.isArray(v)) v = v.join(', ');
