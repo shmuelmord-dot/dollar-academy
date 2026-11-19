@@ -1074,7 +1074,7 @@
         };
 
         const WhatsAppCard = ({msg, onClick}) => (
-            <div className="bg-[#141A2E] border border-[#26304D] rounded-[20px] overflow-hidden cursor-pointer hover:border-[#2E59F4]/30 transition-colors w-full" onClick={onClick}>
+            <div className="bg-[#141A2E] border border-[#26304D] rounded-[20px] overflow-hidden cursor-pointer hover:border-[#2E59F4]/30 transition-colors shrink-0 w-[260px]" onClick={onClick}>
                 <div className="p-3 pb-2">
                     <p className="text-white text-sm font-bold leading-tight">{msg.headline}</p>
                     <p className="text-white/40 text-xs mt-0.5">{msg.name} · {msg.role}</p>
@@ -1997,17 +1997,22 @@
                         <QuoteRotator quoteKeys={PROOF.quoteRotationLanding} />
                     </section>
 
-                    {/* ── 03 · ישר מהוואטסאפ — vertical scroll carousel ── */}
-                    <section className="proof-section flex flex-col items-center gap-4">
+                    {/* ── 03 · ישר מהוואטסאפ — auto-scroll carousel ── */}
+                    <section className="flex flex-col items-center gap-4" style={{width:'100vw',marginInlineStart:'calc(50% - 50vw)',padding:'2.5rem 0'}}>
                         <SectionLabel num="03" text="ישר מהוואטסאפ" />
-                        <h2 className="text-2xl font-extrabold text-white m-0 leading-tight text-center" style={{textWrap:'balance'}}>ההודעות וההקלטות שתלמידי הליווי שולחים לנו</h2>
-                        <div className="w-full flex flex-col gap-3 overflow-y-auto py-2" style={{maxHeight:'520px',scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}}>
-                            <VoiceNoteCard note={galNote} />
-                            {waMessages.map((msg, i) => (
-                                <WhatsAppCard key={i} msg={msg} />
-                            ))}
+                        <h2 className="text-2xl font-extrabold text-white m-0 leading-tight text-center px-5" style={{textWrap:'balance'}}>ההודעות וההקלטות שתלמידי הליווי שולחים לנו</h2>
+                        <div className="w-full overflow-hidden" style={{direction:'ltr'}}>
+                            <div className="marquee-track" style={{animationDuration:'40s',gap:'16px',paddingTop:'8px',paddingBottom:'8px'}}>
+                                {[...Array(2)].map((_, r) => (
+                                    <React.Fragment key={r}>
+                                        {waMessages.map((msg, i) => (
+                                            <WhatsAppCard key={`wa-${r}-${i}`} msg={msg} />
+                                        ))}
+                                    </React.Fragment>
+                                ))}
+                            </div>
                         </div>
-                        <p className="text-[#8A97BE] text-xs text-center">גללו למטה לעוד הודעות. הקלטות וצילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.</p>
+                        <p className="text-[#8A97BE] text-xs text-center px-5">צילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.</p>
                     </section>
 
                     {/* ── Final CTA + TrustLine ── */}
