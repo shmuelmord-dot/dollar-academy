@@ -37,7 +37,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800&family=IBM+Plex+Mono:wght@500;600&family=Rubik:wght@500;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -86,7 +86,7 @@
             overflow-x: hidden;
             font-family: 'Heebo', sans-serif;
         }
-        * {
+        input, textarea {
             unicode-bidi: plaintext;
             text-align: right;
         }
@@ -222,6 +222,204 @@
         .pulse-cta { display: inline-block; animation: heartbeat 1.5s ease-in-out infinite; transform-origin: center; }
         .marquee-track { display: flex; gap: 1rem; width: max-content; animation: scrollHalf 55s linear infinite; will-change: transform; }
         .marquee-track:hover { animation-play-state: paused; }
+        /* --- Proof v2 --- */
+        .proof-section { max-width: 1160px; width: 100%; margin: 0 auto; padding: 2.5rem 1.25rem; }
+        @media (min-width: 1024px) { .proof-section { padding: 3.5rem 2rem; } }
+        @keyframes quoteFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quote-fade { animation: quoteFade 0.45s ease-out; }
+        @keyframes quoteBar { from { width: 0; } to { width: 100%; } }
+
+        /* ==========================================================================
+           השאלון כטיסה · Flight boarding-pass visual layer
+           All classes prefixed fl- to avoid conflicts with existing styles.
+           ========================================================================== */
+        .fl-page { position: relative; overflow: hidden; box-sizing: border-box; min-height: 100vh; padding: 18px 16px 32px; background: #0A0D18; color: #F4F6FC; font-family: Assistant, Heebo, "Segoe UI", Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
+        .fl-col { position: relative; width: 100%; max-width: 440px; display: flex; flex-direction: column; align-items: center; }
+        .fl-glow { position: absolute; top: -240px; left: 50%; width: 560px; height: 460px; margin-left: -280px; border-radius: 50%; background: radial-gradient(closest-side, rgba(46, 89, 244, 0.18), rgba(46, 89, 244, 0)); pointer-events: none; }
+        .fl-mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; direction: ltr; unicode-bidi: isolate; }
+        .fl-ltr { direction: ltr; unicode-bidi: isolate; }
+        .fl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        .fl-page :focus-visible { outline: 2px solid #7AA6FF; outline-offset: 2px; }
+
+        .fl-ticket { position: relative; width: 100%; background: #141A2E; border: 1px solid #26304D; border-radius: 20px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); }
+        .fl-ticket__top { box-sizing: border-box; padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 12px; }
+        .fl-ticket__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .fl-ticket__label { font-size: 13px; font-weight: 700; color: #4282FA; }
+        .fl-ticket__logo { display: block; width: 96px; height: auto; }
+
+        .fl-route { display: flex; align-items: flex-start; gap: 10px; }
+        .fl-route__code { flex: none; padding-top: 4px; font-size: 15px; font-weight: 600; color: #F4F6FC; }
+        .fl-route__code--from { color: #A9B7DE; }
+
+        .fl-track { position: relative; flex: 1 1 0; min-width: 0; height: 46px; }
+        .fl-track__dash { position: absolute; top: 12px; right: 0; left: 0; border-top: 2px dashed #2A3556; }
+        .fl-track__fill { position: absolute; top: 12px; right: 0; width: 6%; height: 2px; border-radius: 2px; background: #2E59F4; }
+        .fl-station__dot { position: absolute; top: 8px; right: var(--at); width: 10px; height: 10px; margin-right: -5px; box-sizing: border-box; border-radius: 50%; background: #141A2E; border: 2px solid #2A3556; transition: background 0.4s ease, border-color 0.4s ease; }
+        .fl-station__label { position: absolute; top: 29px; right: var(--at); transform: translateX(50%); font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; color: #8A97BE; }
+        .fl-station.is-on .fl-station__dot { background: #2E59F4; border-color: #2E59F4; }
+        .fl-station.is-on .fl-station__label { color: #C9D2EC; }
+        .fl-plane { position: absolute; top: 0; right: 6%; width: 26px; height: 26px; margin-right: -13px; box-sizing: border-box; border-radius: 50%; background: #2E59F4; border: 3px solid #141A2E; box-shadow: 0 0 0 4px rgba(46, 89, 244, 0.2); display: flex; align-items: center; justify-content: center; }
+        .fl-plane svg { display: block; transform: rotate(-90deg); }
+        .fl-glide { transition: right 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), width 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+        .fl-perf { position: relative; height: 0; }
+        .fl-perf__notch { position: absolute; top: -12px; width: 12px; height: 24px; box-sizing: border-box; background: #0A0D18; border: 1px solid #26304D; }
+        .fl-perf__notch--r { right: -1px; border-right: none; border-radius: 24px 0 0 24px; }
+        .fl-perf__notch--l { left: -1px; border-left: none; border-radius: 0 24px 24px 0; }
+        .fl-perf__line { position: absolute; top: -1px; right: 22px; left: 22px; border-top: 2px dashed #2A3556; }
+
+        .fl-stub { box-sizing: border-box; padding: 16px 16px 14px; background: #10162A; border-radius: 0 0 19px 19px; display: flex; flex-direction: column; gap: 14px; }
+        .fl-fields { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; }
+        .fl-field { min-width: 0; margin: -5px -6px; padding: 5px 6px; border-radius: 8px; background: rgba(46, 89, 244, 0); transition: background 0.6s ease; display: flex; flex-direction: column; gap: 3px; }
+        .fl-field.is-fresh { background: rgba(46, 89, 244, 0.16); }
+        .fl-field dt { font-size: 11px; font-weight: 600; color: #8A97BE; }
+        .fl-field dd { margin: 0; min-height: 18px; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 13.5px; font-weight: 700; line-height: 1.3; }
+        .fl-field__value { display: inline-block; max-width: 100%; color: #F4F6FC; unicode-bidi: isolate; overflow-wrap: anywhere; }
+        .fl-field[data-k="name"] .fl-field__value { display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .fl-field__empty { color: #3A4566; }
+
+        .fl-barrow { display: flex; align-items: center; gap: 12px; }
+        .fl-barcode { flex: 1 1 0; min-width: 0; height: 22px; display: flex; justify-content: space-between; align-items: stretch; }
+        .fl-bar { flex: none; border-radius: 1px; background: #222B47; transition: background 0.4s ease; }
+        .fl-bar.is-on { background: #C9D2EC; }
+        .fl-count { flex: none; font-size: 12px; font-weight: 600; color: #9DB8FF; }
+
+        .fl-issued { position: absolute; bottom: 8px; left: 12px; transform: rotate(-9deg); padding: 5px 12px; border: 2px solid #4ADE80; border-radius: 8px; background: rgba(10, 13, 24, 0.9); color: #4ADE80; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 15px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; animation: fl-stampIn 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+        .fl-issued[hidden] { display: none; }
+
+        .fl-main { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .fl-card { margin-top: 18px; width: 100%; box-sizing: border-box; padding: 20px 16px 16px; border-radius: 22px; background: #141A2E; border: 1px solid #26304D; display: flex; flex-direction: column; gap: 16px; }
+        .fl-card__meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; font-weight: 700; }
+        .fl-card__stage { color: #4282FA; }
+        .fl-card__count { color: #8A97BE; }
+        .fl-q { margin: 0; text-align: center; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 22px; font-weight: 800; line-height: 1.32; text-wrap: balance; }
+        .fl-sub { margin: -8px 0 0; text-align: center; font-size: 15px; line-height: 1.5; color: #A9B7DE; }
+        .fl-note { margin: -4px 0 0; text-align: center; font-size: 13px; line-height: 1.5; color: #8A97BE; }
+
+        .fl-options { display: flex; flex-direction: column; gap: 10px; }
+        .fl-opt { min-height: 54px; box-sizing: border-box; padding: 12px 14px 12px 16px; border-radius: 14px; background: #1A2140; border: 1px solid #2A3556; color: #F4F6FC; font-family: Assistant, Heebo, "Segoe UI", Arial, sans-serif; text-align: start; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, border-color 0.2s ease; }
+        .fl-opt.is-selected { background: rgba(46, 89, 244, 0.18); border-color: #4282FA; }
+        .fl-opt__text { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+        .fl-opt__label { font-size: 16px; font-weight: 600; line-height: 1.42; }
+        .fl-opt__hint { font-size: 13px; line-height: 1.45; color: #8A97BE; text-align: right; }
+        .fl-opt__radio { flex: none; width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #3A4566; background: transparent; display: flex; align-items: center; justify-content: center; }
+        .fl-opt__radio svg { display: none; }
+        .fl-opt.is-selected .fl-opt__radio { border-color: #2E59F4; background: #2E59F4; }
+        .fl-opt.is-selected .fl-opt__radio svg { display: block; animation: fl-pop 0.35s ease both; }
+
+        .fl-form { display: flex; flex-direction: column; gap: 12px; }
+        .fl-label { font-size: 14px; font-weight: 700; color: #C9D2EC; }
+        .fl-input { box-sizing: border-box; width: 100%; min-height: 58px; padding: 0 16px; border-radius: 14px; background: #1A2140; border: 1px solid #2A3556; color: #F4F6FC; font-family: Assistant, Heebo, "Segoe UI", Arial, sans-serif; font-size: 18px; text-align: center; }
+        .fl-input::placeholder { color: #8A97BE; }
+        .fl-hint { margin: 0; text-align: center; font-size: 13px; line-height: 1.5; color: #8A97BE; }
+        .fl-cta { min-height: 58px; box-sizing: border-box; padding: 8px 14px; border-radius: 14px; border: none; background: #2E59F4; color: #FFFFFF; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 17px; font-weight: 700; line-height: 1.35; cursor: pointer; box-shadow: 0 10px 30px rgba(46, 89, 244, 0.4); }
+        .fl-foot { margin: 0; text-align: center; font-size: 12px; line-height: 1.5; color: #8A97BE; }
+        .fl-back { align-self: center; min-height: 44px; padding: 0 12px; border: none; background: transparent; font-family: Assistant, Heebo, "Segoe UI", Arial, sans-serif; font-size: 14px; color: #8A97BE; cursor: pointer; }
+
+        .fl-pf { margin-top: 22px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+        .fl-pf__faces { display: flex; }
+        .fl-pf__faces .fl-face { width: 34px; height: 34px; box-sizing: border-box; border: 2px solid #0A0D18; }
+        .fl-pf__faces .fl-face + .fl-face { margin-inline-start: -10px; }
+        .fl-pf__text { font-size: 14px; line-height: 1.5; color: #C9D2EC; }
+        .fl-pf__text b { font-weight: 800; color: #F4F6FC; }
+        .fl-face { background-image: url(quiz-flight-upgrade/assets/faces-sprite-8.jpg); background-size: 800% 100%; background-repeat: no-repeat; background-color: #18213F; border-radius: 50%; }
+
+        .fl-pq { margin-top: 22px; padding: 0 6px; width: 100%; box-sizing: border-box; display: flex; align-items: flex-start; gap: 12px; }
+        .fl-pq .fl-face { flex: none; width: 42px; height: 42px; }
+        .fl-pq__body { display: flex; flex-direction: column; gap: 4px; }
+        .fl-pq__text { font-size: 14px; line-height: 1.55; color: #C9D2EC; }
+        .fl-pq__who { font-size: 13px; font-weight: 700; color: #4282FA; }
+        .fl-pc { margin-top: 22px; width: 100%; box-sizing: border-box; padding: 12px; border-radius: 18px; background: #10162A; border: 1px solid #222B47; display: flex; flex-direction: column; gap: 10px; }
+        .fl-pc__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+        .fl-pc__title { font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 15px; font-weight: 800; line-height: 1.3; }
+        .fl-pc__name { flex: none; font-size: 12px; font-weight: 700; color: #4282FA; }
+        .fl-wa { display: block; width: 100%; border-radius: 12px; background-image: url(quiz-flight-upgrade/assets/whatsapp-proofs-sprite.jpg); background-size: 100% auto; background-repeat: no-repeat; background-color: #0B141A; }
+        .fl-trust { width: 100%; margin: 22px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; font-size: 13px; font-weight: 600; color: #C9D2EC; }
+        .fl-trust li { display: flex; align-items: center; gap: 5px; }
+        .fl-trust__icon { color: #2E6BFF; }
+
+        .fl-stage { margin-top: 18px; width: 100%; box-sizing: border-box; padding: 26px 18px 18px; border-radius: 22px; background: #141A2E; border: 1px solid #26304D; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; animation: fl-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+        .fl-stage__icon { width: 56px; height: 56px; border-radius: 50%; background: #2E59F4; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(46, 89, 244, 0.45); animation: fl-pop 0.35s ease both; }
+        .fl-stage__code { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: #9DB8FF; }
+        .fl-stage__title { margin: 0; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 26px; font-weight: 800; line-height: 1.25; text-wrap: balance; }
+        .fl-stage__text { margin: 0; font-size: 16px; line-height: 1.65; color: #C9D2EC; }
+        .fl-stage__text b { font-weight: 800; color: #F4F6FC; }
+        .fl-stage__text .fl-num { font-weight: 800; color: #4ADE80; direction: ltr; unicode-bidi: isolate; }
+        .fl-stage__btn { margin-top: 6px; position: relative; overflow: hidden; width: 100%; min-height: 56px; border-radius: 14px; border: none; background: #2E59F4; color: #FFFFFF; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(46, 89, 244, 0.4); }
+        .fl-stage__timer { position: absolute; top: 0; bottom: 0; right: 0; width: 0; background: rgba(255, 255, 255, 0.14); animation: fl-drain 2.6s linear both; }
+        .fl-stage__btnlabel { position: relative; }
+
+        .fl-print-title { margin: 24px 0 0; text-align: center; font-family: Rubik, Heebo, Assistant, sans-serif; font-weight: 800; font-size: 26px; line-height: 1.25; text-wrap: balance; }
+        .fl-checklist { margin: 18px 0 0; width: 100%; box-sizing: border-box; padding: 12px 16px; border-radius: 22px; background: #141A2E; border: 1px solid #26304D; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+        .fl-check { display: flex; align-items: center; gap: 12px; padding: 9px 0; opacity: 0.45; transition: opacity 0.3s ease; }
+        .fl-check.is-active, .fl-check.is-done { opacity: 1; }
+        .fl-check__icon { flex: none; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .fl-check__wait { width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #26304D; }
+        .fl-check__spin { display: none; width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid rgba(157, 184, 255, 0.3); border-top-color: #9DB8FF; animation: fl-spin 1s linear infinite; }
+        .fl-check__done { display: none; width: 26px; height: 26px; border-radius: 50%; background: #2E59F4; align-items: center; justify-content: center; }
+        .fl-check.is-active .fl-check__wait, .fl-check.is-done .fl-check__wait { display: none; }
+        .fl-check.is-active .fl-check__spin { display: block; }
+        .fl-check.is-done .fl-check__done { display: flex; animation: fl-pop 0.35s ease both; }
+        .fl-check__label { font-size: 15px; font-weight: 600; line-height: 1.4; }
+
+        .fl-quote { margin: 26px 0 0; width: 100%; box-sizing: border-box; padding: 0 6px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+        .fl-quote blockquote { margin: 0; font-family: Rubik, Heebo, Assistant, sans-serif; font-size: 17px; font-weight: 700; line-height: 1.55; color: #F4F6FC; text-wrap: balance; }
+        .fl-quote figcaption { font-size: 15px; font-weight: 700; color: #4282FA; }
+
+        @keyframes fl-stamp { 0% { opacity: 0; transform: scale(1.9) rotate(-8deg); } 55% { opacity: 1; transform: scale(0.92) rotate(1deg); } 100% { opacity: 1; transform: none; } }
+        .fl-stamp { animation: fl-stamp 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+        @keyframes fl-stampIn { 0% { opacity: 0; transform: rotate(-9deg) scale(1.8); } 60% { opacity: 1; transform: rotate(-9deg) scale(0.94); } 100% { opacity: 1; transform: rotate(-9deg) scale(1); } }
+        @keyframes fl-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        @keyframes fl-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+        @keyframes fl-spin { to { transform: rotate(360deg); } }
+        @keyframes fl-drain { from { width: 100%; } to { width: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+          .fl-glide, .fl-field, .fl-bar, .fl-opt, .fl-check, .fl-station__dot { transition: none; }
+          .fl-stamp, .fl-issued, .fl-stage, .fl-stage__icon, .fl-opt.is-selected .fl-opt__radio svg, .fl-check.is-done .fl-check__done { animation: none; }
+          .fl-check__spin { animation-duration: 3s; }
+          .fl-stage__timer { display: none; }
+        }
+
+        /* --- Slide CTA ("החלק כדי לעלות") --- */
+        .dsc { box-sizing: border-box; width: 100%; max-width: 440px; margin: 0 auto; padding: 0 16px; direction: rtl; font-family: Assistant, "Segoe UI", Arial, sans-serif; color: #F4F6FC; }
+        .dsc *, .dsc *::before, .dsc *::after { box-sizing: border-box; }
+        .dsc-card { padding: 20px 16px 16px; border-radius: 24px; background: #141A2E; border: 1px solid #26304D; box-shadow: 0 24px 60px rgba(0,0,0,0.45); display: flex; flex-direction: column; gap: 16px; }
+        .dsc-faces { display: flex; }
+        .dsc-face { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #141A2E; background-image: url(public/faces-sprite-8.jpg); background-size: 800% 100%; background-repeat: no-repeat; background-color: #18213F; }
+        .dsc-face + .dsc-face { margin-inline-start: -10px; }
+        .dsc-text { display: flex; flex-direction: column; gap: 6px; }
+        .dsc-title { font-family: Rubik, Assistant, sans-serif; font-size: 21px; font-weight: 800; line-height: 1.3; text-wrap: balance; }
+        .dsc-sub { font-size: 15px; line-height: 1.5; color: #A9B7DE; }
+        .dsc-sub b { font-weight: 800; color: #F4F6FC; }
+        .dsc-track { --p: 0; position: relative; height: 60px; border-radius: 999px; background: #0F1426; border: 1px solid #26304D; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .dsc-fill { position: absolute; top: 0; bottom: 0; right: 0; width: calc(58px + (100% - 58px) * var(--p)); border-radius: 999px; background: rgba(46,89,244,0.22); transition: width 0.45s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease; }
+        .dsc-label { position: absolute; top: 0; bottom: 0; right: 58px; left: 48px; display: flex; align-items: center; justify-content: center; font-family: Rubik, Assistant, sans-serif; font-size: 16px; font-weight: 700; white-space: nowrap; background-image: linear-gradient(90deg, #8A97BE 0%, #8A97BE 40%, #FFFFFF 50%, #8A97BE 60%, #8A97BE 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dsc-shine 2.4s linear infinite; }
+        .dsc-done { position: absolute; top: 0; bottom: 0; right: 0; left: 58px; display: none; align-items: center; justify-content: center; font-family: Rubik, Assistant, sans-serif; font-size: 16px; font-weight: 800; color: #4ADE80; }
+        .dsc-usa { position: absolute; top: 50%; left: 18px; transform: translateY(-50%); font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; direction: ltr; unicode-bidi: isolate; font-size: 12px; font-weight: 600; color: #8A97BE; }
+        .dsc-knob { position: absolute; top: 3px; right: calc(3px + (100% - 58px) * var(--p)); width: 52px; height: 52px; padding: 0; margin: 0; border-radius: 50%; border: none; background: #2E59F4; box-shadow: 0 8px 24px rgba(46,89,244,0.5); display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; transition: right 0.45s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease; }
+        .dsc-knob:focus-visible { outline: 2px solid #7AA6FF; outline-offset: 3px; }
+        .dsc-knob svg { display: block; }
+        .dsc-knob .dsc-check { display: none; }
+        .dsc-hint { margin: -4px 0 0; text-align: center; font-size: 12px; line-height: 1.5; color: #8A97BE; }
+        .dsc.is-idle .dsc-knob { animation: dsc-nudge 2.6s ease-in-out infinite; }
+        .dsc.is-dragging .dsc-fill, .dsc.is-dragging .dsc-knob { transition: none; }
+        .dsc.is-dragging .dsc-knob { cursor: grabbing; }
+        .dsc.is-done .dsc-fill { background: rgba(74,222,128,0.18); }
+        .dsc.is-done .dsc-knob { background: #4ADE80; box-shadow: 0 8px 24px rgba(74,222,128,0.45); cursor: default; }
+        .dsc.is-done .dsc-knob .dsc-plane { display: none; }
+        .dsc.is-done .dsc-knob .dsc-check { display: block; animation: dsc-pop 0.3s ease both; }
+        .dsc.is-done .dsc-label, .dsc.is-done .dsc-usa { display: none; }
+        .dsc.is-done .dsc-done { display: flex; animation: dsc-pop 0.3s ease both; }
+        @keyframes dsc-shine { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+        @keyframes dsc-nudge { 0%, 62%, 100% { transform: translateX(0); } 74% { transform: translateX(-12px); } 86% { transform: translateX(0); } }
+        @keyframes dsc-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+          .dsc-label { animation: none; background: none; color: #C9D2EC; }
+          .dsc.is-idle .dsc-knob { animation: none; }
+          .dsc-fill, .dsc-knob { transition-duration: 0.15s; }
+          .dsc.is-done .dsc-knob .dsc-check, .dsc.is-done .dsc-done { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -327,6 +525,67 @@
                 footnote: 'הפרטים משמשים לשליחת ההדרכה וליצירת קשר בנוגע לתהליך. בלי למכור אותם ובלי משחקים.'
             }
         ];
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ Flight boarding-pass data — visual layer on the quiz
+        // ═══════════════════════════════════════════════════════════════
+        const FLIGHT_DATA = {
+            // Map quiz answer values to short ticket-field display values
+            ticket_fields: [
+                { key: 'style', label: 'סגנון', source_q: 0, values: { 'נוודות דיגיטלית': 'מכל מקום בעולם', 'פינה קבועה': 'מהבית או מהמשרד' } },
+                { key: 'char', label: 'אופי', source_q: 1, values: { 'שונא מסגרות': 'יזמי וחופשי', 'אוהב יציבות': 'יציב ומסודר' } },
+                { key: 'goal', label: 'יעד חודשי', source_q: 2, dir: 'ltr', values: { '$5k-$10k': '$5K-$10K', '$10k-$20k': '$10K-$20K', '$20k+': '$20K+', 'skill': 'יכולת חדשה' } },
+                { key: 'prof', label: 'פרופיל', source_q: 3, values: { 'owner': 'בעל עסק בארץ', 'employee': 'שכיר ששואף לעצמאות', 'beginner': 'יזם בתחילת הדרך' } },
+                { key: 'time', label: 'זמן ביום', source_q: 4, values: { 'פחות משעה ביום': 'פחות משעה', '1-3 שעות ביום': '1-3 שעות', '3-5 שעות ביום': '3-5 שעות', '5+ שעות ביום': 'יותר מ-5 שעות' } },
+                null, // Q6 (thinkerType) has no ticket field
+                { key: 'name', label: 'נוסע', source_q: 6 }, // firstName — live typed
+                null, null, null // Q8-Q10 have no ticket fields
+            ],
+            // The 6 fields in display order (3x2 grid RTL): row1: name, prof, goal; row2: style, char, time
+            field_order: [
+                { key: 'name', label: 'נוסע' },
+                { key: 'prof', label: 'פרופיל' },
+                { key: 'goal', label: 'יעד חודשי' },
+                { key: 'style', label: 'סגנון' },
+                { key: 'char', label: 'אופי' },
+                { key: 'time', label: 'זמן ביום' }
+            ],
+            // Plane position (right: N%) by number of answered questions
+            plane_pct: { 0: 6, 1: 14, 2: 22, 3: 30, 4: 40, 5: 50, 6: 60, 7: 67.5, 8: 75, 9: 82.5, 10: 90 },
+            plane_max: 96,
+            stations: [
+                { at: 30, label: 'צ׳ק-אין', after_q: 3 },
+                { at: 60, label: 'דרכונים', after_q: 6 },
+                { at: 90, label: 'שער', after_q: 10 }
+            ],
+            stages: [
+                { id: 'checkin', name: 'צ׳ק-אין', questions: [0, 1, 2] },
+                { id: 'passport', name: 'ביקורת דרכונים', questions: [3, 4, 5] },
+                { id: 'gate', name: 'שער העלייה', questions: [6, 7, 8, 9] }
+            ],
+            barcode_widths: [2,1,3,1,1,2,3,1,2,1,1,3,2,1,2,3,1,1,2,1,3,2,1,1,2,3,1,2,1,1,3,1,2,2,1,3,1,1,2,1,3,2,1,2],
+            stage_screens: [
+                { after_q: 2, code: 'CHECK-IN · 3/10', title: 'צ׳ק-אין הושלם', cta: 'המשך לביקורת דרכונים', next_q: 3 },
+                { after_q: 5, code: 'PASSPORT · 6/10', title: 'עברת את ביקורת הדרכונים', cta: 'המשך לשער העלייה', next_q: 6 }
+            ],
+            // Proof data per question (matches the reference)
+            proofs: [
+                { type: 'trust' },
+                { type: 'quote', who: 'שי בוזגלו', fpos: '0% 0%', quote: 'החלום הוורוד הזה, להקים איזשהו עסק מניב מעבר לים. את הדרך להגשים אותו קשה לי לדמיין בלי שחר ושמואל.' },
+                { type: 'chat', name: 'יובל', head: '$15,300 בחודש, כמעט $11,000 רווח', h: 296, y: '19.0459%' },
+                { type: 'quote', who: 'רזיאל ינאי', fpos: '85.7143% 0%', quote: 'לא היה לי רקע בתחום של סוכנויות שיווק מחוץ לארץ... הם הפכו דברים מורכבים לפשוטים.' },
+                { type: 'quote', who: 'קובי רבינוביץ', fpos: '71.4286% 0%', quote: 'מה שהיה לוקח לי בעצמי כמה חודשים, עשיתי פה בשבועיים, שלושה, ארבעה שבועות.' },
+                { type: 'quote', who: 'לירם אהרוני', fpos: '57.1429% 0%', quote: 'להרוויח כסף בדולרים ולא בשקלים, עם לקוחות שהם אמריקאים. זה המקום.' },
+                { type: 'trust' },
+                { type: 'faces' },
+                { type: 'quote', who: 'סול רנטו', fpos: '42.8571% 0%', quote: "נותנים את האמת בפנים... זה כאילו שילוב של קואצ'רים עם יועצים עסקיים ויועצי שיווק, והכול, וחברים." },
+                { type: 'chat', name: 'עמית', head: 'הלקוח הראשון נסגר: $1,200, ומהחודש הבא $1,500', h: 429, y: '30.8683%' }
+            ],
+            faces_positions: ['0% 0%', '14.2857% 0%', '28.5714% 0%', '42.8571% 0%', '57.1429% 0%', '85.7143% 0%', '100% 0%'],
+            // Print screen mapping
+            char_long: { 'יזמי וחופשי': 'נפש יזמית וחופשית', 'יציב ומסודר': 'אוהב יציבות ובהירות' },
+            goal_long: { '$5K-$10K': '5,000$-10,000$', '$10K-$20K': '10,000$-20,000$', '$20K+': '20,000$+' }
+        };
 
         // ═══════════════════════════════════════════════════════════════
         // 🎬 אווטארים — סרטון הדרכה מותאם + webhook לכל אווטאר
@@ -456,6 +715,373 @@
             };
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // 🏆 Proof v2 — data + reusable components
+        // ═══════════════════════════════════════════════════════════════
+        const PROOF = (() => {
+            const pv2 = 'public/proof-v2/';
+            return {
+                trust: ['+100 תלמידים שכבר מרוויחים בדולר', '+8 שנים בשוק האמריקאי', '$10M הכנסות מנוהלות'],
+                facePile: ['shai','ron','daniel','sol','liram','raziel','gal'],
+                facePileText: '+100 תלמידים שכבר מרוויחים בדולר',
+                people: {
+                    shai:     { name:'שי בוזגלו', role:'לקוח ליווי', face:pv2+'faces/shai-buzaglo.jpg' },
+                    ron:      { name:'רון חיים', role:'לקוח ליווי', face:pv2+'faces/ron-haim.jpg' },
+                    daniel:   { name:'דניאל משה', role:'לקוח ליווי', face:pv2+'faces/daniel-moshe.jpg' },
+                    sol:      { name:'סול רנטו', role:'לקוח ליווי', face:pv2+'faces/sol-renato.jpg' },
+                    liram:    { name:'לירם אהרוני', role:'לקוח ליווי', face:pv2+'faces/liram-aharoni.jpg' },
+                    kobi:     { name:'קובי רבינוביץ׳', role:'בעל עסק ויזם · שותף ב-RemodeLeads', face:pv2+'faces/kobi-rabinowitz.jpg' },
+                    raziel:   { name:'רזיאל ינאי', role:'לקוח ליווי', face:pv2+'faces/raziel-yanai.jpg' },
+                    gal:      { name:'גל אברהם', role:'לקוח ליווי', face:pv2+'faces/gal-avraham.jpg' },
+                    ofir:     { name:'אופיר קרן', role:'לקוח ליווי', face:'public/testimonials/profile-ofir.png' },
+                    elisheva: { name:'אלישבע אייזקס', role:'לקוחת ליווי', face:'public/testimonials/profile-elisheva.png' },
+                    robi:     { name:'רובי מנצור', role:'לקוח ליווי', face:'public/testimonials/profile-robi.png' },
+                    yehuda:   { name:'יהודה וקנין', role:'לקוח ליווי', face:'public/testimonials/profile-yehuda.png' },
+                    beni:     { name:'בני גולדשטיין', role:'לקוח ליווי', face:null },
+                    adi:      { name:'עדי נחמיה', role:'לקוח ליווי', face:pv2+'people/adi-nehemia.jpg' },
+                    roy:      { name:'רועי כהן', role:'לקוח ליווי', face:pv2+'people/roy-cohen.jpg' },
+                    netta:    { name:'נטע וינשטוק', role:'לקוחת ליווי', face:null }
+                },
+                quotes: {
+                    daniel_1:  { person:'daniel', text:'לפני שלושה חודשים נכנסתי לאקדמיית הדולר. לפני עשר דקות סיימתי עוד שיחה עם עוד לקוח אמריקאי משלם.' },
+                    raziel_1:  { person:'raziel', text:'לא היה לי רקע בתחום של סוכנויות שיווק מחוץ לארץ... הם הפכו דברים מורכבים לפשוטים.' },
+                    liram_1:   { person:'liram', text:'להרוויח כסף בדולרים ולא בשקלים, עם לקוחות שהם אמריקאים. זה המקום.' },
+                    kobi_1:    { person:'kobi', text:'מה שהיה לוקח לי בעצמי כמה חודשים, עשיתי פה בשבועיים, שלושה, ארבעה שבועות.' },
+                    ron_1:     { person:'ron', text:'לעשות את זה לבד... זה פשוט בזבוז זמן, ולוקח הרבה יותר זמן וכסף בניסוי וטעייה.' },
+                    shai_1:    { person:'shai', text:'מה שאתם מצפים לקבל בשקלים, תקבלו בדולרים.' },
+                    ofir_1:    { person:'ofir', text:'באמת אכפת להם מההצלחה שלכם, וזה מורגש בכל אינטראקציה איתם.' },
+                    sol_1:     { person:'sol', text:"נותנים את האמת בפנים... זה כאילו שילוב של קואצ'רים עם יועצים עסקיים ויועצי שיווק, והכול, וחברים." },
+                    raziel_2:  { person:'raziel', text:'משהו שנראה לי בעבר כמו פרויקט גדול ומפחיד הפך להיות ממש משחק.' },
+                    gal_1:     { person:'gal', text:'כל מי שרוצה עסק אמיתי באמריקה, עם לקוחות אמריקאים.' },
+                    kobi_2:    { person:'kobi', text:'צוות שמנחה אותי, שמונע ממני לעשות שטויות לא הכרחיות.' },
+                    shai_2:    { person:'shai', text:'החלום הוורוד הזה, להקים איזשהו עסק מניב מעבר לים. את הדרך להגשים אותו קשה לי לדמיין בלי שחר ושמואל.' }
+                },
+                quoteRotationLanding: ['daniel_1','raziel_1','liram_1','kobi_1','ron_1','shai_1','ofir_1','sol_1','raziel_2','gal_1','kobi_2','shai_2'],
+                chapters: [
+                    { id:'shai', t:3, time:'0:03', firstName:'שי' },
+                    { id:'ron', t:18, time:'0:18', firstName:'רון' },
+                    { id:'daniel', t:53, time:'0:53', firstName:'דניאל' },
+                    { id:'sol', t:79, time:'1:19', firstName:'סול' },
+                    { id:'liram', t:114, time:'1:54', firstName:'לירם' },
+                    { id:'kobi', t:137, time:'2:17', firstName:'קובי' },
+                    { id:'raziel', t:160, time:'2:40', firstName:'רזיאל' },
+                    { id:'gal', t:179, time:'2:59', firstName:'גל' }
+                ],
+                landingQuotes: [
+                    { person:'daniel', text:'לפני שלושה חודשים נכנסתי לאקדמיית הדולר. לפני עשר דקות סיימתי עוד שיחה עם עוד לקוח אמריקאי משלם.' },
+                    { person:'ron', text:'לעשות את זה לבד... זה פשוט בזבוז זמן, ולוקח הרבה יותר זמן וכסף בניסוי וטעייה.' },
+                    { person:'shai', text:'מה שאתם מצפים לקבל בשקלים, תקבלו בדולרים.' }
+                ],
+                landingVideos: {
+                    compilation: { title:'כולם ביחד, בסרטון אחד', subtitle:'סרטון ההמלצות · 3:22', youtube_id:'VY0adZ8EVuw', poster:'https://img.youtube.com/vi/VY0adZ8EVuw/maxresdefault.jpg' },
+                    shorts: [
+                        { person:'daniel', line:'3 חודשים מהכניסה ללקוח אמריקאי משלם', youtube_id:'GocNQDPxetk' },
+                        { person:'raziel', line:'בלי רקע בסוכנויות מחוץ לארץ', youtube_id:'1IFlSlMXg7Q' },
+                        { person:'shai', line:'החלום: עסק מניב מעבר לים', youtube_id:'YFVro4kjd4c' }
+                    ]
+                },
+                voiceNotes: [
+                    { person:'gal', file:'public/whatsappScreenshoots/wa-video-2.mp4', header:'גל אברהם', sub:'לקוח ליווי · הקלטה מהוואטסאפ', caption:'תלחצו פליי ותשמעו את גל במילים שלו.' },
+                    { person:'netta', file:'public/whatsappScreenshoots/wa-video-1.mp4', header:'נטע וינשטוק', sub:'לקוחת ליווי · הקלטה מהוואטסאפ', caption:'ותשמעו גם את נטע, במילים שלה.' }
+                ],
+                whatsappMessages: {
+                    amir:  { file:'public/whatsappScreenshoots/wa-new-1.webp', name:'אמיר', role:'לקוח ליווי', headline:'ינואר נסגר על 13 אלף דולר, כמעט 10 רווח' },
+                    yuval: { file:'public/whatsappScreenshoots/wa-new-2.webp', name:'יובל', role:'לקוח ליווי', headline:'$15,300 בחודש, כמעט $11,000 רווח' },
+                    amit:  { file:'public/whatsappScreenshoots/wa-new-3.webp', name:'עמית', role:'לקוח ליווי', headline:'הלקוח הראשון נסגר: $1,200, ומהחודש הבא $1,500' },
+                    chen:  { file:'public/whatsappScreenshoots/wa-new-4.webp', name:'חן', role:'לקוח ליווי', headline:'חודש חמישי בתכנית: $10,500' },
+                    dina:  { file:'public/whatsappScreenshoots/wa-new-7.webp', name:'דינה', role:'לקוחה ליווי', headline:'לקוח שלישי בשלושה ימים' },
+                    roni:  { file:'public/whatsappScreenshoots/wa-new-8.webp', name:'רוני', role:'לקוחה ליווי', headline:'7 לקוחות פעילים, $9,900 החודש' },
+                    ram:   { file:'public/whatsappScreenshoots/wa-new-11.webp', name:'רם', role:'לקוח ליווי', headline:'3 עסקאות ביום אחד: $4,000' }
+                },
+                whatsappLanding: { first:'voice:gal', then:['chen','yuval','amir','roni','ram'] },
+                whatsappChats: [
+                    { file:'public/whatsappScreenshoots/wa-full-10.jpg', chat_with:'עדי נחמיה' },
+                    { file:'public/whatsappScreenshoots/wa-full-05.jpg', chat_with:'לירם אהרוני' },
+                    { file:'public/whatsappScreenshoots/wa-full-01.jpg', chat_with:'קובי רבינוביץ׳' },
+                    { file:'public/whatsappScreenshoots/wa-full-08.jpg', chat_with:'סיון' },
+                    { file:'public/whatsappScreenshoots/wa-full-03.jpg', chat_with:'הקהילה של אקדמיית הדולר' },
+                    { file:'public/whatsappScreenshoots/wa-full-06.jpg', chat_with:'לירם אהרוני' },
+                    { file:'public/whatsappScreenshoots/wa-full-07.jpg', chat_with:'אוראל' },
+                    { file:'public/whatsappScreenshoots/wa-full-09.jpg', chat_with:'קובי רבינוביץ׳' },
+                    { file:'public/whatsappScreenshoots/wa-full-04.jpg', chat_with:'לירם אהרוני' },
+                    { file:'public/whatsappScreenshoots/wa-full-02.jpg', chat_with:'קובי רבינוביץ׳' }
+                ],
+                stripePayments: [
+                    { file:'public/stripe/Screenshot - 2025-05-21T111242.884.png', amount_usd:5400 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111402.485.png', amount_usd:3200 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111312.447.png', amount_usd:2900 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111257.483.png', amount_usd:2700 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111346.599.png', amount_usd:2550 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111213.337.png', amount_usd:2200 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111225.083.png', amount_usd:2000 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111155.766.png', amount_usd:1800 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111329.734.png', amount_usd:1750 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111126.933.png', amount_usd:1600 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111139.461.png', amount_usd:1430 },
+                    { file:'public/stripe/Screenshot - 2025-05-21T111114.072.png', amount_usd:1200 }
+                ],
+                spotlightOrder: [
+                    { person:'liram', gross:12500, month:null, pct:null, screenshot:'public/proof/stripe-liram.png', caption:'צמיחה עקבית, חודש אחר חודש' },
+                    { person:'kobi', gross:122030, month:'ינואר 2026', pct:'+13.4%', screenshot:pv2+'stripe-gross/kobi-rabinowitz-2026-01.webp', caption:'מחזור חודשי בינואר 2026' },
+                    { person:'daniel', gross:39991, month:'דצמבר 2025', pct:'+13.1%', screenshot:pv2+'stripe-gross/daniel-moshe-2025-12.webp', caption:'מחזור חודשי בדצמבר 2025' },
+                    { person:'adi', gross:212243, month:'פברואר 2026', pct:'+4.9%', screenshot:pv2+'stripe-gross/adi-nehemia-2026-02.webp', caption:'מחזור חודשי בפברואר 2026' },
+                    { person:'raziel', gross:8100, month:null, pct:null, screenshot:'public/proof/stripe-raziel.png', caption:'3 לקוחות משלמים בחודש השלישי' },
+                    { person:'roy', gross:76120, month:'מרץ 2026', pct:'+8.1%', screenshot:pv2+'stripe-gross/roy-cohen-2026-03.webp', caption:'מחזור חודשי במרץ 2026' }
+                ],
+                testimonialFeed: [
+                    { person:'liram', kind:'podcast', title:'המסע של לירם בפודקאסט', youtube_id:'d_0lIa6Q1qg', quote:'liram_1', stripe:{ screenshot:'public/proof/stripe-liram.png', label:'מחזור ב-Stripe', amount:12500 } },
+                    { person:'shai', kind:'short', youtube_id:'YFVro4kjd4c', quote:'shai_2' },
+                    { person:'kobi', kind:'podcast', title:'המסע של קובי בפודקאסט', youtube_id:'dhUDv6r7e78', quote:'kobi_1', stripe:{ screenshot:pv2+'stripe-gross/kobi-rabinowitz-2026-01.webp', label:'מחזור ב-Stripe · ינואר 2026', amount:122030 } },
+                    { person:'daniel', kind:'short', youtube_id:'GocNQDPxetk', quote:'daniel_1', stripe:{ screenshot:pv2+'stripe-gross/daniel-moshe-2025-12.webp', label:'מחזור ב-Stripe · דצמבר 2025', amount:39991 } },
+                    { person:'raziel', kind:'short', youtube_id:'1IFlSlMXg7Q', quote:'raziel_2', stripe:{ screenshot:'public/proof/stripe-raziel.png', label:'מחזור ב-Stripe', amount:8100 } },
+                    { person:'ofir', kind:'short', youtube_id:'fBn6dfU9QA4', quote:'ofir_1' },
+                    { person:'sol', kind:'short', youtube_id:'zqtdLeaNpro', quote:'sol_1' },
+                    { person:'ron', kind:'video', title:'העדות המלאה של רון', youtube_id:'49sNHmZbiqI', quote:'ron_1' },
+                    { person:'elisheva', kind:'short', youtube_id:'4Z40cl7ZW38', quote:null },
+                    { person:'robi', kind:'short', youtube_id:'kLbq1ZYvBvw', quote:null },
+                    { person:'beni', kind:'short', youtube_id:'6tFwrReZ-ug', quote:null },
+                    { person:'yehuda', kind:'short', youtube_id:'OhawXW1sF7U', quote:null }
+                ],
+                quizProof: { 1:{type:'trust_line'}, 2:{type:'quote',quote:'shai_2'}, 3:{type:'whatsapp',id:'yuval'}, 4:{type:'quote',quote:'raziel_1'}, 5:{type:'quote',quote:'kobi_1'}, 6:{type:'quote',quote:'liram_1'}, 7:{type:'trust_line'}, 8:{type:'face_pile'}, 9:{type:'quote',quote:'sol_1'}, 10:{type:'whatsapp',id:'amit'} },
+                trainingByAvatar: {
+                    beginner: { quotes:['raziel_1','ron_1','daniel_1'], whatsapp:'amit', insertAfter:1 },
+                    employee: { quotes:['liram_1','shai_1','gal_1'], whatsapp:'roni', insertAfter:2 },
+                    owner:    { quotes:['kobi_1','liram_1','sol_1'], whatsapp:'amir', insertAfter:3 }
+                },
+                bridgeQuote: 'ron_1',
+                partnerStory: { person:'kobi', quote:'kobi_2', text:'בעסקים שאנחנו מאמינים בהם, אנחנו לא עוצרים בליווי. קובי רבינוביץ׳ הגיע אלינו כבעל עסק ויזם שרצה לפרוץ לשוק האמריקאי, והיום הוא שותף שלנו ב-RemodeLeads, סוכנות הפרסום האמריקאית שלנו.' },
+                about: {
+                    photo: pv2+'brand/founders-statue-of-liberty.jpg',
+                    tiles: [['+100','תלמידים שכבר מרוויחים בדולר'],['+8','שנים בשוק האמריקאי'],['$10M','הכנסות מנוהלות']],
+                    text: 'שמואל ושחר פעילים בשיווק מ-2017. ב-2019 נכנסו לשוק האמריקאי, פיצחו את השיטה והקימו סוכנות משגשגת עם 20+ עובדים.'
+                }
+            };
+        })();
+
+        const TRAINING_TICKET = {
+            stopLabels: { TLV:'היום', VIA:'המודל', 'CHECK-IN':'בלי תירוצים', ARRIVED:'מישהו שכבר נחת', USA:'היעד', GATE:'עלייה למטוס' },
+            avatars: {
+                owner: {
+                    label: 'בעל עסק בארץ',
+                    stops: [
+                        { code:'TLV', para:1, big:[['משלם ',''],['לואו קוסט','r'],[' ומצפה ל',''],['פרימיום','g']] },
+                        { code:'ARRIVED', wa:'amir' },
+                        { code:'USA', para:2 },
+                        { code:'GATE', para:3 }
+                    ]
+                },
+                employee: {
+                    label: 'שכיר ששואף לעצמאות',
+                    stops: [
+                        { code:'TLV', para:1, big:[['אתה בונה חלום, פשוט לא את שלך.','']] },
+                        { code:'VIA', para:2, big:[['הם משלמים לך כל חודש, ',''],['בדולר','g'],['.','']] },
+                        { code:'ARRIVED', wa:'roni' },
+                        { code:'USA', para:3 },
+                        { code:'GATE', para:4 }
+                    ]
+                },
+                beginner: {
+                    label: 'יזם בתחילת הדרך',
+                    stops: [
+                        { code:'VIA', para:1, big:[['יש מודל אחד ',''],['נקי','g'],[' באמת','']] },
+                        { code:'ARRIVED', wa:'amit' },
+                        { code:'CHECK-IN', para:2, big:[['אתה לא צריך ניסיון קודם או אנגלית מושלמת.','']] },
+                        { code:'USA', para:3 },
+                        { code:'GATE', para:4 }
+                    ]
+                }
+            },
+            waCards: {
+                amir: { name:'אמיר', role:'לקוח ליווי', img:'public/whatsappScreenshoots/wa-new-1.webp', summary:'ינואר נסגר על 13 אלף דולר, כמעט 10 רווח' },
+                roni: { name:'רוני', role:'לקוחה ליווי', img:'public/whatsappScreenshoots/wa-new-8.webp', summary:'7 לקוחות פעילים, $9,900 החודש' },
+                amit: { name:'עמית', role:'לקוח ליווי', img:'public/whatsappScreenshoots/wa-new-3.webp', summary:'הלקוח הראשון נסגר: $1,200, ומהחודש הבא $1,500' }
+            }
+        };
+
+        const ADVANCED_DATA = {
+            stories: [
+                { youtube_id:'d_0lIa6Q1qg', name:'לירם אהרוני', tag:'פודקאסט · המסע המלא' },
+                { youtube_id:'YFVro4kjd4c', name:'שי בוזגלו', tag:'עדות מלאה' },
+                { youtube_id:'dhUDv6r7e78', name:'קובי רבינוביץ', tag:'פודקאסט · המסע המלא' },
+                { youtube_id:'GocNQDPxetk', name:'דניאל משה', tag:'עדות מלאה' },
+                { youtube_id:'1IFlSlMXg7Q', name:'רזיאל ינאי', tag:'עדות מלאה' },
+                { youtube_id:'fBn6dfU9QA4', name:'אופיר קרן', tag:'עדות מלאה' },
+                { youtube_id:'zqtdLeaNpro', name:'סול רנטו', tag:'עדות מלאה' },
+                { youtube_id:'49sNHmZbiqI', name:'רון חיים', tag:'עדות מלאה' },
+                { youtube_id:'4Z40cl7ZW38', name:'אלישבע אייזקס', tag:'עדות מלאה' },
+                { youtube_id:'kLbq1ZYvBvw', name:'רובי מנצור', tag:'עדות מלאה' },
+                { youtube_id:'6tFwrReZ-ug', name:'בני גולדשטיין', tag:'עדות מלאה' },
+                { youtube_id:'OhawXW1sF7U', name:'יהודה וקנין', tag:'עדות מלאה' }
+            ],
+            whyUsa: [
+                { label:'קהל יעד פוטנציאלי', big:'פי 34', sub:'אנשים בארה״ב, מול ישראל', progress:100, panelTitle:'פי 34 אנשים. פי 50 עסקים.', panelText:'גם 100% מהשוק בישראל הם כ-3% מהשוק בארה״ב. כל נקודה כאן היא אוכלוסייה בגודל של ישראל.', dots:34, bars:{'אוכלוסייה':['10.1 מיליון','341.8 מיליון'],'עסקים שאפשר למכור להם':['711 אלף','36.2 מיליון']}, source:'מקורות: הבנק העולמי 2025 (אוכלוסייה); SBA Office of Advocacy 2026; הלמ״ס 2024. הגדרת "עסק" אינה זהה בשני המקורות.' },
+                { label:'פוטנציאל זינוק במחזור', big:'86%', sub:'מנוע דולר חזק + 0% מע״מ ביצוא', progress:86, panelTitle:'מנוע הדולר: יותר כוח קנייה, ו-0% מע״מ ביצוא', panelText:'ללקוח האמריקאי יש פי 1.5 כוח קנייה לנפש. ובמכירה ללקוחות בחו״ל המע״מ הוא בשיעור אפס, במקום 18% בישראל (בכפוף לתנאי החוק).', vatCards:{'מע״מ בישראל':'18%','מע״מ ביצוא':'0%'}, bars:{'כוח קנייה לנפש':['$59,717','$90,027']}, source:'מקורות: הבנק העולמי 2025, חזר לנפש במונחי כוח קנייה; חוק מס ערך מוסף, סעיף 30. ה-86% הוא הערכה ראשונית לפי הנתונים שמילאת.' },
+                { label:'התאמת מודל', big:'89%', sub:'היתכנות מוכחת בישראל', progress:89, panelTitle:'המודל מוכח — עסקים ישראלים כבר עושים את זה', panelText:'האקדמיה ליוותה מעל 100 עסקים ישראלים שהתחילו למכור ללקוחות אמריקאים. המודל מוכח ועובד עבור מגוון רחב של תחומים ושירותים.', source:'נתון פנימי של אקדמיית הדולר, 2024-2026.' }
+            ]
+        };
+
+        const SectionLabel = ({num, text}) => (
+            <div className="flex items-center justify-center mb-2">
+                <span className="font-bold" style={{fontSize:'14px',letterSpacing:'.04em',color:'#4282FA'}}>{num} · {text}</span>
+            </div>
+        );
+
+        const ProofFacePile = () => (
+            <div className="flex items-center justify-center gap-0 mt-4">
+                <div className="flex" style={{direction:'ltr'}}>
+                    {PROOF.facePile.map((k, i) => {
+                        const p = PROOF.people[k];
+                        return p.face ? <img key={k} src={p.face} alt={p.name} className="w-10 h-10 rounded-full border-2 border-[#080f20] object-cover" style={{marginLeft: i > 0 ? '-10px' : 0, zIndex: PROOF.facePile.length - i}} loading="lazy" /> : null;
+                    })}
+                </div>
+                <span className="text-white/60 text-sm mr-3">{PROOF.facePileText}</span>
+            </div>
+        );
+
+        const TrustLine = () => (
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-white/50 text-sm">
+                {PROOF.trust.map((t, i) => (
+                    <span key={i} className="flex items-center gap-1.5 whitespace-nowrap">
+                        <span>{i === 0 ? '★' : '✓'}</span>
+                        <span style={{direction:'ltr',unicodeBidi:'isolate'}}>{t}</span>
+                    </span>
+                ))}
+            </div>
+        );
+
+        const QuoteRotator = ({quoteKeys, interval = 6000}) => {
+            const [idx, setIdx] = useState(0);
+            const [animKey, setAnimKey] = useState(0);
+            const len = quoteKeys.length;
+            const advance = () => { setIdx(i => (i + 1) % len); setAnimKey(k => k + 1); };
+            useEffect(() => { const t = setInterval(advance, interval); return () => clearInterval(t); }, [len, interval]);
+            const qk = quoteKeys[idx];
+            const q = PROOF.quotes[qk];
+            if (!q) return null;
+            const p = PROOF.people[q.person];
+            return (
+                <div className="w-full max-w-xl mx-auto text-center cursor-pointer" onClick={advance}>
+                    <div key={animKey} className="quote-fade flex flex-col items-center gap-3 px-4">
+                        {p && p.face && <img src={p.face} alt={p.name} className="w-14 h-14 rounded-full object-cover border-2 border-white/20" loading="lazy" />}
+                        <p className="text-white text-lg md:text-xl leading-relaxed" style={{textAlign:'center'}}>"{q.text}"</p>
+                        {p && <span className="text-white/50 text-sm">{p.name} · {p.role}</span>}
+                    </div>
+                    <div className="mt-4 h-0.5 bg-white/10 rounded-full overflow-hidden max-w-xs mx-auto">
+                        <div key={animKey} className="h-full bg-[#2E59F4] rounded-full" style={{animation: 'quoteBar ' + interval + 'ms linear'}} />
+                    </div>
+                </div>
+            );
+        };
+
+        const InlineVideoPlayer = () => {
+            const [playing, setPlaying] = useState(false);
+            const [activeCh, setActiveCh] = useState(0);
+            const iframeRef = useRef(null);
+            const comp = PROOF.landingVideos.compilation;
+            const chapters = PROOF.chapters;
+
+            const play = (startSec) => {
+                setPlaying(true);
+                if (iframeRef.current) {
+                    iframeRef.current.src = 'https://www.youtube.com/embed/' + comp.youtube_id + '?autoplay=1&start=' + startSec + '&rel=0&modestbranding=1&enablejsapi=1';
+                }
+            };
+            const seekTo = (ch, i) => {
+                setActiveCh(i);
+                if (playing) {
+                    iframeRef.current.src = 'https://www.youtube.com/embed/' + comp.youtube_id + '?autoplay=1&start=' + ch.t + '&rel=0&modestbranding=1&enablejsapi=1';
+                } else {
+                    play(ch.t);
+                }
+            };
+
+            return (
+                <div className="flex flex-col gap-4 w-full">
+                    <div className="relative w-full rounded-[20px] border border-[#26304D] overflow-hidden" style={{aspectRatio:'16/9'}}>
+                        {!playing ? (
+                            <button onClick={() => play(0)} className="absolute inset-0 w-full h-full border-none p-0 cursor-pointer" style={{background:'linear-gradient(180deg, rgba(10,13,24,0) 45%, rgba(10,13,24,0.9))'}}>
+                                <img src={comp.poster} alt={comp.title} className="w-full h-full object-cover" />
+                                <span className="absolute inset-0 flex items-center justify-center">
+                                    <span className="w-16 h-16 bg-[#2E59F4] rounded-full flex items-center justify-center shadow-[0_14px_40px_rgba(0,0,0,0.5)]">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="#FFFFFF" style={{marginLeft:'4px'}}><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+                                    </span>
+                                </span>
+                                <span className="absolute right-4 bottom-3 flex flex-col gap-0.5 text-right text-white">
+                                    <span className="text-[17px] font-extrabold" style={{fontFamily:'Rubik, sans-serif'}}>{comp.title}</span>
+                                    <span className="text-[13px] text-[#C9D2EC]">{comp.subtitle}</span>
+                                </span>
+                            </button>
+                        ) : (
+                            <iframe ref={iframeRef} src={'https://www.youtube.com/embed/' + comp.youtube_id + '?autoplay=1&rel=0&modestbranding=1&enablejsapi=1'} className="w-full h-full" frameBorder="0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+                        )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[13px] text-[#A9B7DE]">בחרו את מי לשמוע:</span>
+                        <div className="flex justify-between gap-1">
+                            {chapters.map((ch, i) => {
+                                const p = PROOF.people[ch.id];
+                                const active = i === activeCh && playing;
+                                return (
+                                    <button key={ch.id} onClick={() => seekTo(ch, i)} className="flex flex-col items-center gap-1 p-0 border-none bg-transparent cursor-pointer" style={{flex:'none'}}>
+                                        <img src={p.face} alt={p.name} className="block rounded-full object-cover" style={{width:'38px',height:'38px',border:active?'2px solid #2E59F4':'2px solid #26304D',boxSizing:'border-box'}} loading="lazy" />
+                                        <span className="text-[11.5px] font-bold" style={{color:active?'#F4F6FC':'#A9B7DE'}}>{ch.firstName}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const YouTubeModal = ({videoId, onClose}) => {
+            useEffect(() => {
+                const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+                document.addEventListener('keydown', onKey);
+                document.body.style.overflow = 'hidden';
+                return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+            }, [onClose]);
+            return (
+                <div className="fixed inset-0 z-[500] bg-black/90 flex items-center justify-center p-4" onClick={onClose}>
+                    <button onClick={onClose} className="absolute top-4 left-4 md:top-6 md:left-6 text-white/90 hover:text-white text-2xl w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 z-10" aria-label="סגור">✕</button>
+                    <div className="w-full max-w-[860px]" style={{aspectRatio:'16/9'}} onClick={e => e.stopPropagation()}>
+                        <iframe src={'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1'} className="w-full h-full rounded-2xl" frameBorder="0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen></iframe>
+                    </div>
+                </div>
+            );
+        };
+
+        const VoiceNoteCard = ({note}) => {
+            const p = PROOF.people[note.person];
+            return (
+                <div className="bg-[#141A2E] border border-[#26304D] rounded-[20px] p-4 flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                        {p && p.face && <img src={p.face} alt={note.header} className="w-12 h-12 rounded-full object-cover border-2 border-white/20" loading="lazy" />}
+                        <div>
+                            <p className="text-white font-bold text-sm">{note.header}</p>
+                            <p className="text-white/40 text-xs">{note.sub}</p>
+                        </div>
+                    </div>
+                    <video controls playsInline preload="metadata" className="w-full rounded-lg bg-black/30" style={{maxHeight:'200px',objectFit:'contain'}}>
+                        <source src={note.file} type="video/mp4" />
+                    </video>
+                    <p className="text-white/50 text-sm">{note.caption}</p>
+                </div>
+            );
+        };
+
+        const WhatsAppCard = ({msg, onClick}) => (
+            <div className="bg-[#141A2E] border border-[#26304D] rounded-[20px] overflow-hidden cursor-pointer hover:border-[#2E59F4]/30 transition-colors shrink-0 w-[260px] lg:w-auto" onClick={onClick}>
+                <div className="p-3 pb-2">
+                    <p className="text-white text-sm font-bold leading-tight">{msg.headline}</p>
+                    <p className="text-white/40 text-xs mt-0.5">{msg.name} · {msg.role}</p>
+                </div>
+                <div className="px-3 pb-3">
+                    <img src={msg.file} alt={'הודעת וואטסאפ — ' + msg.name} className="w-full rounded-lg" loading="lazy" />
+                </div>
+            </div>
+        );
+
         function resolveAvatar(key) {
             return AVATARS[key] ? key : 'beginner';
         }
@@ -463,31 +1089,30 @@
         // בונה את הטקסט המותאם לכל אווטאר בדף ההדרכה (שלב 1)
         function renderAvatarCopy(avatarKey, ctx) {
             const { name, mappedLocation, mappedIncome, incomeGoal } = ctx;
-            const tight = { textAlign: 'center', lineHeight: '1.6', width: '100%', color: 'white', fontSize: '1.25rem', marginBottom: '20px' };
-            const blue  = { color: '#3b82f6', fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center', lineHeight: '1.6', width: '100%', marginBottom: '20px' };
-            const red   = { color: '#ff4d4d', fontWeight: 'bold' };
-            const green = { color: '#4ade80', fontWeight: 'bold' };
+            const tight = { margin: 0, fontSize: '17px', lineHeight: '1.7', color: '#C9D2EC', fontWeight: '400' };
+            const blue  = { margin: 0, fontSize: '17px', lineHeight: '1.7', color: '#4282FA', fontWeight: '800' };
+            const red   = { color: '#FFFFFF', fontWeight: '800' };
+            const green = { color: '#4282FA', fontWeight: '800' };
 
             const Header = (
-                <>
-                    <h1 className="text-center w-full reveal-glow" style={{ fontSize: 'clamp(1.7rem, 7vw, 2.8rem)', fontWeight: 'bold', marginBottom: '15px' }}>{name ? name + ', ' : ''}אתה לא מחפש עוד טרנד. אתה מחפש את ההזדמנות שלך.</h1>
-                    <div className="w-[80%] border-b border-white/10 mb-6 mx-auto"></div>
-                </>
+                <h1 style={{ margin: '26px 20px 0', textAlign: 'center', fontFamily: 'Rubik, sans-serif', fontWeight: 800, fontSize: '27px', lineHeight: '1.25', textWrap: 'balance', color: '#F4F6FC' }}>{name ? name + ', ' : ''}אתה לא מחפש עוד טרנד. <span style={{color:'#4282FA'}}>אתה מחפש את ההזדמנות שלך.</span></h1>
             );
             if (avatarKey === 'owner') {
                 return {
                     part1: (
                         <>
                             {Header}
-                            <div style={tight}>אתה כבר יודע מה זה להחזיק עסק. להביא לידים, לסגור לקוחות, לנהל אותם ולתת את השירות הכי טוב שאפשר. הבעיה? אתה נותן המון ערך, ולא מתוגמל בהתאם.</div>
-                            <div style={tight}>הבעיה היא לא בך, ולא בלקוחות שלך.</div>
-                            <p style={{ ...tight, fontSize: '1.5rem', fontWeight: 'bold' }}>הבעיה היא בשוק שאתה משרת.</p>
+                            <div style={{margin:'18px 22px 26px',display:'flex',flexDirection:'column',gap:'12px',textAlign:'center'}}>
+                                <p style={tight}>אתה כבר יודע מה זה להחזיק עסק. להביא לידים, לסגור לקוחות, לנהל אותם ולתת את השירות הכי טוב שאפשר. הבעיה? אתה נותן המון ערך, ולא מתוגמל בהתאם.</p>
+                                <p style={tight}>הבעיה היא לא בך, ולא בלקוחות שלך.</p>
+                                <p style={blue}>הבעיה היא בשוק שאתה משרת.</p>
+                            </div>
                         </>
                     ),
                     part2: [
-                        (<div style={{ ...tight, marginBottom: 0 }}>הלקוח הישראלי זה הלקוח היחידי בעולם שמשלם <span style={red}>לואו קוסט</span> ומצפה ל<span style={green}>פרימיום</span>, זה לקוח שמעדיף מחיר נמוך על גבי ערך גבוה. אז מה הפלא שאתה לא יכול להיות מתוגמל בהתאם לערך שאתה מביא לשולחן?</div>),
-                        (<p style={{ ...blue, marginBottom: 0 }}>בתור בעל עסק בארץ ששואף לצאת לשוק האמריקאי ולבנות הכנסה יציבה של {incomeGoal === '$20k+' ? '' : 'בין '}{mappedIncome} בחודש, אתה חייב להתחיל לעבוד חכם ולא קשה.</p>),
-                        (<p style={{ ...tight, marginBottom: 0, fontWeight: 'bold' }}>אז הגיע הזמן להפסיק לתת פול גז על ניוטרל, ולהתחיל להרוויח <span style={green}>בדולר</span> מול השוק היציב והחזק ביותר בעולם — עם פוטנציאל גדילה בלתי סופי.</p>)
+                        (<p style={tight}>הלקוח הישראלי זה הלקוח היחידי בעולם שמשלם <span style={red}>לואו קוסט</span> ומצפה ל<span style={green}>פרימיום</span>, זה לקוח שמעדיף מחיר נמוך על גבי ערך גבוה. אז מה הפלא שאתה לא יכול להיות מתוגמל בהתאם לערך שאתה מביא לשולחן?</p>),
+                        (<p style={tight}>בתור בעל עסק בארץ ששואף לצאת לשוק האמריקאי ולבנות הכנסה יציבה של {incomeGoal === '$20k+' ? '' : 'בין '}<span style={{direction:'ltr',unicodeBidi:'isolate',fontWeight:800}}>{mappedIncome}</span> בחודש, אתה חייב להתחיל לעבוד חכם ולא קשה.</p>),
+                        (<p style={tight}>אז הגיע הזמן להפסיק לתת פול גז על ניוטרל, ולהתחיל להרוויח <span style={green}>בדולר</span> מול השוק היציב והחזק ביותר בעולם — עם פוטנציאל גדילה בלתי סופי.</p>)
                     ]
                 };
             }
@@ -496,15 +1121,17 @@
                     part1: (
                         <>
                             {Header}
-                            <div style={tight}>שנים שאתה עושה הכל בשביל החברה שאתה עובד בה. אתה פותר בעיות, מחזיק את העסק, נותן ערך בלי סוף - ובסוף כל חודש התלוש נראה אותו דבר בדיוק.</div>
-                            <div style={tight}>הבעיה היא לא בך. הבעיה היא שאתה נמצא במסגרת שנועדה לתגמל אותך במינימום האפשרי.</div>
+                            <div style={{margin:'18px 22px 26px',display:'flex',flexDirection:'column',gap:'12px',textAlign:'center'}}>
+                                <p style={tight}>שנים שאתה עושה הכל בשביל החברה שאתה עובד בה. אתה פותר בעיות, מחזיק את העסק, נותן ערך בלי סוף - ובסוף כל חודש התלוש נראה אותו דבר בדיוק.</p>
+                                <p style={tight}>הבעיה היא לא בך. הבעיה היא שאתה נמצא במסגרת שנועדה לתגמל אותך במינימום האפשרי.</p>
+                            </div>
                         </>
                     ),
                     part2: [
-                        (<div style={{ ...tight, marginBottom: 0 }}>כשכיר אתה תמיד מוכר את הזמן שלך. יש <span style={red}>תקרת שכר</span>, יש מנהל, ובסוף החודש הרווח הגדול הולך למישהו אחר. אתה בונה חלום, פשוט לא את שלך.</div>),
-                        (<div style={{ ...tight, marginBottom: 0 }}>את אותה מקצועיות, משמעת ואת אותם כלים בדיוק אפשר להפנות לעסק משלך: סוכנות שיווק שמשרתת עסקים בארה״ב, ופותרת להם את הבעיה שלא נגמרת - מאיפה יגיעו הלקוחות הבאים. הם משלמים לך כל חודש, <span style={green}>בדולר</span>. לא לפי שעון נוכחות, אלא לפי הערך שאתה מייצר.</div>),
-                        (<p style={{ ...blue, marginBottom: 0 }}>בתור שכיר ששואף לצאת לעצמאות אמיתית ולעבוד {mappedLocation}, זה לא כזה תלוש מהמציאות לבנות הכנסה יציבה של {mappedIncome} בחודש.</p>),
-                        (<p style={{ ...tight, marginBottom: 0, fontWeight: 'bold' }}>אז הגיע הזמן להפסיק לבנות את החלום של מישהו אחר, ולבנות <span style={green}>עסק וסיסטם</span> שממשיך לעבוד גם כשאתה לא.</p>)
+                        (<p style={tight}>כשכיר אתה תמיד מוכר את הזמן שלך. יש <span style={red}>תקרת שכר</span>, יש מנהל, ובסוף החודש הרווח הגדול הולך למישהו אחר. אתה בונה חלום, פשוט לא את שלך.</p>),
+                        (<p style={tight}>את אותה מקצועיות, משמעת ואת אותם כלים בדיוק אפשר להפנות לעסק משלך: סוכנות שיווק שמשרתת עסקים בארה״ב, ופותרת להם את הבעיה שלא נגמרת - מאיפה יגיעו הלקוחות הבאים. הם משלמים לך כל חודש, <span style={green}>בדולר</span>. לא לפי שעון נוכחות, אלא לפי הערך שאתה מייצר.</p>),
+                        (<p style={tight}>בתור שכיר ששואף לצאת לעצמאות אמיתית ולעבוד {mappedLocation}, זה לא כזה תלוש מהמציאות לבנות הכנסה יציבה של <span style={{direction:'ltr',unicodeBidi:'isolate',fontWeight:800}}>{mappedIncome}</span> בחודש.</p>),
+                        (<p style={tight}>אז הגיע הזמן להפסיק לבנות את החלום של מישהו אחר, ולבנות <span style={green}>עסק וסיסטם</span> שממשיך לעבוד גם כשאתה לא.</p>)
                     ]
                 };
             }
@@ -513,16 +1140,18 @@
                 part1: (
                     <>
                         {Header}
-                        <div style={tight}>יש לך את הראש הנכון - אתה חושב כמו יזם, פשוט עוד לא מצאת את כלי הרכב הנכון.</div>
-                        <div style={tight}>כבר ראית את כל "ההזדמנויות": דרופשיפינג שהופך אותך לנציג שירות של ספק סיני ב-2 בלילה, אמזון שקובר לך את הכסף במלאי, שיווק שותפים שבו אתה בונה את העסק של מישהו אחר.</div>
-                        <div style={tight}>כולם דרשו הון, סיכון וכאב ראש - כדי להישאר בדיוק באותו מקום.</div>
+                        <div style={{margin:'18px 22px 26px',display:'flex',flexDirection:'column',gap:'12px',textAlign:'center'}}>
+                            <p style={tight}>יש לך את הראש הנכון - אתה חושב כמו יזם, פשוט עוד לא מצאת את כלי הרכב הנכון.</p>
+                            <p style={tight}>כבר ראית את כל "ההזדמנויות": דרופשיפינג שהופך אותך לנציג שירות של ספק סיני ב-2 בלילה, אמזון שקובר לך את הכסף במלאי, שיווק שותפים שבו אתה בונה את העסק של מישהו אחר.</p>
+                            <p style={tight}>כולם דרשו הון, סיכון וכאב ראש - כדי להישאר בדיוק באותו מקום.</p>
+                        </div>
                     </>
                 ),
                 part2: [
-                    (<div style={{ ...tight, marginBottom: 0 }}>יש מודל אחד <span style={green}>נקי</span> באמת: סוכנות שיווק שמשרתת עסקים בארה״ב. בלי מלאי, בלי סיכון, בלי הון התחלתי. אתה פותר לעסק האמריקאי את הבעיה שלא נגמרת - מאיפה יגיעו הלקוחות הבאים, והוא משלם לך על זה כל חודש, <span style={green}>בדולר</span>.</div>),
-                    (<div style={{ ...tight, marginBottom: 0 }}>לא, אתה לא צריך ניסיון קודם או אנגלית מושלמת. אתה צריך שיטה שעובדת, ליווי צמוד, והרבה רצון לתת בראש.</div>),
-                    (<p style={{ ...blue, marginBottom: 0 }}>בתור יזם בתחילת דרכו ששואף לעבוד {mappedLocation} ולבנות הכנסה יציבה של {mappedIncome} בחודש, חייב לעשות פעם אחת את הדברים כמו שצריך.</p>),
-                    (<p style={{ ...tight, marginBottom: 0, fontWeight: 'bold' }}>אז מה אתה אומר{name ? ', ' + name : ''}? אתה מוכן לעשות את הקפיצה האמיתית בחיים שלך — בשוק הנכון, עם הלקוחות הנכונים, ועם התגמול הנכון?</p>)
+                    (<p style={tight}>יש מודל אחד <span style={green}>נקי</span> באמת: סוכנות שיווק שמשרתת עסקים בארה״ב. בלי מלאי, בלי סיכון, בלי הון התחלתי. אתה פותר לעסק האמריקאי את הבעיה שלא נגמרת - מאיפה יגיעו הלקוחות הבאים, והוא משלם לך על זה כל חודש, <span style={green}>בדולר</span>.</p>),
+                    (<p style={tight}>לא, אתה לא צריך ניסיון קודם או אנגלית מושלמת. אתה צריך שיטה שעובדת, ליווי צמוד, והרבה רצון לתת בראש.</p>),
+                    (<p style={tight}>בתור יזם בתחילת דרכו ששואף לעבוד {mappedLocation} ולבנות הכנסה יציבה של <span style={{direction:'ltr',unicodeBidi:'isolate',fontWeight:800}}>{mappedIncome}</span> בחודש, חייב לעשות פעם אחת את הדברים כמו שצריך.</p>),
+                    (<p style={tight}>אז מה אתה אומר{name ? ', ' + name : ''}? אתה מוכן לעשות את הקפיצה האמיתית בחיים שלך — בשוק הנכון, עם הלקוחות הנכונים, ועם התגמול הנכון?</p>)
                 ]
             };
         }
@@ -575,6 +1204,10 @@
             const [loadingProgress, setLoadingProgress] = useState(0);
             const [bridgeRain, setBridgeRain] = useState(false);
             const modalNameRef = useRef(null);
+            const iframeRef = useRef(null);
+            const [storiesOpen, setStoriesOpen] = useState(false);
+            const [storyPlaying, setStoryPlaying] = useState(null);
+            const [whyOpen, setWhyOpen] = useState(0);
             
             // CRITICAL FIX: Forced Facebook Pixel AddToCart Event
             // This fires on mount for all training variations regardless of state
@@ -727,7 +1360,7 @@
                                     <span className="text-[14px] text-[#fbbf24] font-black">{loadingProgress}%</span>
                                 </div>
                                 <div className="w-full h-3 bg-white/5 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 h-full bg-[#1f73f7] shadow-[0_0_20px_#1f73f7] transition-all duration-75 ease-linear" style={{ 
+                                    <div className="absolute top-0 left-0 h-full bg-[#2E59F4] shadow-[0_0_20px_#2E59F4] transition-all duration-75 ease-linear" style={{ 
                                         width: `${loadingProgress}%`
                                     }}></div>
                                 </div>
@@ -754,69 +1387,464 @@
                 name: leadData.firstName || '',
                 incomeGoal: leadData.incomeGoal,
                 mappedLocation: leadData.workspacePreference === 'נוודות דיגיטלית' ? 'מכל מקום בעולם' : 'בנוחות ובסטנדרט שלך',
-                mappedIncome: leadData.incomeGoal === '$20k+' ? '20,000$+' : leadData.incomeGoal === '$10k-$20k' ? '10,000$-20,000$' : '5,000$-10,000$'
+                mappedIncome: leadData.incomeGoal === '$20k+' ? '$20,000+' : leadData.incomeGoal === '$10k-$20k' ? '$10,000–$20,000' : '$5,000–$10,000'
             };
             const avatarCopy = renderAvatarCopy(avatarKey, avatarCtx);
             const bridgeBtnText = isSubmitting ? 'מעבד...' : (avatarKey === 'beginner' ? 'סקרנת אותי, אני רוצה עוד פרטים' : 'אני רוצה עוד פרטים, סקרנת אותי');
             const bridgeBtn2Text = isSubmitting ? 'מעבד...' : (avatarKey === 'owner' ? 'קח אותי לשלב הבא, נשמע מעניין' : 'יאללה קח אותי לשלב הבא');
 
-            return (
+            const ticketData = TRAINING_TICKET.avatars[avatarKey] || TRAINING_TICKET.avatars.beginner;
+            const stopLabels = TRAINING_TICKET.stopLabels;
+
+            const requestFullscreen = () => {
+                const iframe = iframeRef.current;
+                if (!iframe) return;
+                if (iframe.requestFullscreen) iframe.requestFullscreen();
+                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+            };
+
+            const SlideCTA = ({ onComplete }) => {
+                const rootRef = useRef(null);
+                const trackRef = useRef(null);
+                const knobRef = useRef(null);
+                const labelRef = useRef(null);
+                const dragRef = useRef(null);
+                const doneRef = useRef(false);
+                const skipClickRef = useRef(false);
+                const pRef = useRef(0);
+                const KNOB_SPAN = 58;
+                const COMPLETE_AT = 0.8;
+                const MOVE_THRESHOLD = 5;
+
+                const setP = (v) => {
+                    const p = Math.max(0, Math.min(1, v));
+                    pRef.current = p;
+                    if (trackRef.current) trackRef.current.style.setProperty('--p', p.toFixed(4));
+                    if (labelRef.current) labelRef.current.style.opacity = String(Math.max(0, 1 - p * 2.5));
+                    const root = rootRef.current;
+                    if (root) {
+                        root.classList.toggle('is-idle', !doneRef.current && !dragRef.current && p === 0);
+                    }
+                };
+
+                const complete = () => {
+                    if (doneRef.current) return;
+                    doneRef.current = true;
+                    dragRef.current = null;
+                    const root = rootRef.current;
+                    if (root) { root.classList.remove('is-dragging'); root.classList.add('is-done'); }
+                    setP(1);
+                    if (knobRef.current) knobRef.current.setAttribute('aria-disabled', 'true');
+                    setTimeout(() => { if (onComplete) onComplete(); }, 450);
+                };
+
+                useEffect(() => {
+                    setP(0);
+                    const knob = knobRef.current;
+                    if (!knob) return;
+                    const root = rootRef.current;
+                    const track = trackRef.current;
+
+                    const onDown = (e) => {
+                        if (doneRef.current) return;
+                        dragRef.current = { x0: e.clientX, max: Math.max(1, track.getBoundingClientRect().width - KNOB_SPAN), moved: false };
+                        try { knob.setPointerCapture(e.pointerId); } catch(err) {}
+                        root.classList.add('is-dragging');
+                        setP(pRef.current);
+                    };
+                    const onMove = (e) => {
+                        if (!dragRef.current) return;
+                        const dx = dragRef.current.x0 - e.clientX;
+                        if (Math.abs(dx) > MOVE_THRESHOLD) dragRef.current.moved = true;
+                        if (dragRef.current.moved) setP(dx / dragRef.current.max);
+                    };
+                    const onUp = () => {
+                        if (!dragRef.current) return;
+                        const moved = dragRef.current.moved;
+                        dragRef.current = null;
+                        root.classList.remove('is-dragging');
+                        if (!moved) { setP(pRef.current); return; }
+                        skipClickRef.current = true;
+                        if (pRef.current >= COMPLETE_AT) complete();
+                        else setP(0);
+                    };
+                    const onClick = () => {
+                        if (skipClickRef.current) { skipClickRef.current = false; return; }
+                        complete();
+                    };
+                    const onPageShow = (e) => {
+                        if (e.persisted) {
+                            doneRef.current = false; skipClickRef.current = false; dragRef.current = null;
+                            root.classList.remove('is-done', 'is-dragging');
+                            knob.removeAttribute('aria-disabled');
+                            setP(0);
+                        }
+                    };
+
+                    knob.addEventListener('pointerdown', onDown);
+                    knob.addEventListener('pointermove', onMove);
+                    knob.addEventListener('pointerup', onUp);
+                    knob.addEventListener('pointercancel', onUp);
+                    knob.addEventListener('click', onClick);
+                    window.addEventListener('pageshow', onPageShow);
+                    return () => {
+                        knob.removeEventListener('pointerdown', onDown);
+                        knob.removeEventListener('pointermove', onMove);
+                        knob.removeEventListener('pointerup', onUp);
+                        knob.removeEventListener('pointercancel', onUp);
+                        knob.removeEventListener('click', onClick);
+                        window.removeEventListener('pageshow', onPageShow);
+                    };
+                }, []);
+
+                return (
+                    <div className="dsc is-idle" ref={rootRef}>
+                        <div className="dsc-card">
+                            <span className="dsc-faces" aria-hidden="true">
+                                <span className="dsc-face" style={{backgroundPosition:'28.5714% 0%'}}></span>
+                                <span className="dsc-face" style={{backgroundPosition:'71.4286% 0%'}}></span>
+                                <span className="dsc-face" style={{backgroundPosition:'0% 0%'}}></span>
+                                <span className="dsc-face" style={{backgroundPosition:'14.2857% 0%'}}></span>
+                                <span className="dsc-face" style={{backgroundPosition:'57.1429% 0%'}}></span>
+                            </span>
+                            <span className="dsc-text">
+                                <span className="dsc-title">תראה אנשים מהשטח שהיו במקום שלך</span>
+                                <span className="dsc-sub">ולאן הם הגיעו תוך <b>6 חודשים</b> עם האקדמיה</span>
+                            </span>
+                            <div className="dsc-track" ref={trackRef}>
+                                <span className="dsc-fill" aria-hidden="true"></span>
+                                <span className="dsc-label" ref={labelRef} aria-hidden="true">החלק כדי לראות אותם</span>
+                                <span className="dsc-done" aria-live="polite">בדרך אליהם…</span>
+                                <span className="dsc-usa" aria-hidden="true">USA</span>
+                                <button type="button" className="dsc-knob" ref={knobRef} aria-label="לצפייה באנשים מהשטח ולאן הם הגיעו">
+                                    <svg className="dsc-plane" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF" style={{transform:'rotate(-90deg)'}}><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+                                    <svg className="dsc-check" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A0D18" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                </button>
+                            </div>
+                            <p className="dsc-hint">אפשר גם פשוט ללחוץ על המטוס</p>
+                        </div>
+                    </div>
+                );
+            };
+
+            const StoriesLink = () => (
                 <>
-                    <div className="flex flex-col items-center justify-start min-h-[80vh] p-6 pt-12 md:pt-20 fade-enter fade-enter-active w-full">
-                        <div className="max-w-4xl w-full text-center space-y-8 center-all">
-                            {stage === 1 ? (
-                                <div className="max-w-4xl w-full mx-auto fade-enter fade-enter-active flex flex-col items-center" style={{ textAlign: 'center', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    {avatarCopy.part1}
+                    <button onClick={() => setStoriesOpen(true)} className="text-[#A9B7DE] text-sm bg-transparent border-none cursor-pointer mt-2 hover:text-white transition-colors">לצפייה בעוד הרבה סיפורי הצלחה של אנשים בדיוק כמוך</button>
+                    {storiesOpen && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[300] flex items-end lg:items-center justify-center" onClick={() => { setStoriesOpen(false); setStoryPlaying(null); }}>
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+                            <div className="relative z-10 w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-t-3xl lg:rounded-3xl" style={{background:'#141A2E'}} onClick={e => e.stopPropagation()}>
+                                <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 border-b border-white/10" style={{background:'#141A2E'}}>
+                                    <div>
+                                        <h3 className="text-lg font-extrabold text-white m-0">סיפורי הצלחה</h3>
+                                        <p className="text-xs text-white/50 m-0">12 עדויות מלאות, כולל שני פרקי פודקאסט</p>
+                                    </div>
+                                    <button onClick={() => { setStoriesOpen(false); setStoryPlaying(null); }} className="w-8 h-8 rounded-full bg-white/10 border-none text-white text-lg cursor-pointer flex items-center justify-center">×</button>
                                 </div>
-                            ) : (
+                                {storyPlaying && (
+                                    <div className="px-4 pt-4">
+                                        <div className="video-wrapper" style={{borderRadius:'16px',overflow:'hidden'}}>
+                                            <iframe src={`https://www.youtube.com/embed/${storyPlaying}?autoplay=1&modestbranding=1&rel=0`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+                                    {ADVANCED_DATA.stories.map((s, i) => (
+                                        <button key={i} onClick={() => setStoryPlaying(s.youtube_id)} className="flex flex-col items-center gap-2 p-3 rounded-2xl border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.08] transition-colors text-center" style={{background: storyPlaying === s.youtube_id ? 'rgba(66,130,250,0.15)' : undefined, borderColor: storyPlaying === s.youtube_id ? '#4282FA' : undefined}}>
+                                            <img src={`https://img.youtube.com/vi/${s.youtube_id}/mqdefault.jpg`} alt={s.name} className="w-full rounded-xl aspect-video object-cover" loading="lazy" />
+                                            <span className="text-sm font-bold text-white">{s.name}</span>
+                                            <span className="text-[11px] text-white/50">{s.tag}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>,
+                    document.body)}
+                </>
+            );
+
+            const WhyUsaSection = () => {
+                const openTile = whyOpen !== null ? ADVANCED_DATA.whyUsa[whyOpen] : null;
+                const renderPanel = (tile) => (
+                    <div className="p-6 lg:p-8">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-lg lg:text-xl font-extrabold text-white m-0">{tile.panelTitle}</h3>
+                            <button onClick={(e) => {e.stopPropagation(); setWhyOpen(null);}} className="w-8 h-8 rounded-full bg-white/10 border-none text-white/60 text-sm cursor-pointer flex items-center justify-center hover:bg-white/20 shrink-0 ml-4">✕</button>
+                        </div>
+                        <p className="text-sm text-[#A9B7DE] mb-6 leading-relaxed max-w-2xl">{tile.panelText}</p>
+                        {tile.dots && (
+                            <div className="flex flex-wrap gap-2 justify-center mb-6 max-w-md mx-auto">
+                                {Array.from({length: tile.dots}).map((_, d) => (
+                                    <div key={d} className="w-5 h-5 rounded-full bg-[#2E59F4]" style={{opacity:0.6 + 0.4*Math.min(d/tile.dots, 1)}}></div>
+                                ))}
+                                <div className="w-5 h-5 rounded-full bg-white/30"></div>
+                            </div>
+                        )}
+                        {tile.vatCards && (
+                            <div className="flex gap-4 justify-center mb-6">
+                                {Object.entries(tile.vatCards).map(([label, val]) => (
+                                    <div key={label} className="rounded-xl border border-white/10 px-6 py-4 text-center" style={{background:'rgba(255,255,255,0.03)',minWidth:'120px'}}>
+                                        <div className="text-xs text-white/50 mb-1">{label}</div>
+                                        <div className="text-3xl font-black text-white" style={{fontFamily:'Rubik, sans-serif'}}>{val}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {tile.bars && Object.entries(tile.bars).map(([label, vals]) => (
+                            <div key={label} className="mb-5">
+                                <div className="text-sm font-bold text-white/70 mb-2 text-right">{label}</div>
+                                <div className="flex gap-3 items-center mb-1.5">
+                                    <span className="text-xs text-white/50 w-10 text-right shrink-0">ישראל</span>
+                                    <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+                                        <div className="h-full rounded-full" style={{background:'rgba(255,255,255,0.3)',width:'30%'}}></div>
+                                    </div>
+                                    <span className="text-sm text-white/60 font-semibold w-24 text-left shrink-0" style={{direction:'ltr',unicodeBidi:'isolate'}}>{vals[0]}</span>
+                                </div>
+                                <div className="flex gap-3 items-center">
+                                    <span className="text-xs text-white/50 w-10 text-right shrink-0">ארה״ב</span>
+                                    <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+                                        <div className="h-full rounded-full bg-[#2E59F4]" style={{width:'100%'}}></div>
+                                    </div>
+                                    <span className="text-sm text-[#4282FA] font-bold w-24 text-left shrink-0" style={{direction:'ltr',unicodeBidi:'isolate'}}>{vals[1]}</span>
+                                </div>
+                            </div>
+                        ))}
+                        {tile.source && <p className="text-[11px] text-white/30 mt-4 leading-relaxed">{tile.source}</p>}
+                    </div>
+                );
+                return (
+                <div className="max-w-[1160px] w-full mx-auto px-5 mt-8 mb-12">
+                    <SectionLabel num="01" text="למה דווקא ארה״ב" />
+                    <h2 className="text-xl lg:text-3xl font-extrabold text-white text-center mb-2">למה דווקא השוק האמריקאי?</h2>
+                    <p className="text-sm text-white/50 text-center mb-6">לחצו על כל נתון כדי לראות מאיפה הוא מגיע</p>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {ADVANCED_DATA.whyUsa.map((tile, i) => (
+                            <React.Fragment key={i}>
+                                <div className="rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300" style={{background:'#141A2E', borderColor: whyOpen === i ? '#4282FA' : 'rgba(255,255,255,0.08)'}} onClick={() => setWhyOpen(whyOpen === i ? null : i)}>
+                                    <div className="p-5 text-center">
+                                        <div className="text-xs text-white/50 mb-1">{tile.label}</div>
+                                        <div className="text-4xl lg:text-5xl font-black text-white my-3" style={{fontFamily:'Rubik, sans-serif'}}>{tile.big}</div>
+                                        <div className="text-sm text-[#A9B7DE] font-semibold mb-3">{tile.sub}</div>
+                                        <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{background:'rgba(66,130,250,0.15)'}}>
+                                            <div className="h-full rounded-full transition-all duration-700" style={{background:'#2E59F4',width:(tile.progress||0)+'%'}}></div>
+                                        </div>
+                                        <div className="text-xs text-white/40 flex items-center justify-center gap-1">
+                                            <span>{whyOpen === i ? 'סגירה' : 'פירוט ומקור'}</span>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{transform:whyOpen===i?'rotate(180deg)':'',transition:'transform 0.3s'}}><path d="M6 9l6 6 6-6"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                {whyOpen === i && openTile && (
+                                    <div className="lg:hidden rounded-2xl border border-[#4282FA] overflow-hidden animate-fade-in" style={{background:'#141A2E'}}>
+                                        {renderPanel(openTile)}
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                    {openTile && (
+                        <div className="hidden lg:block mt-4 rounded-2xl border border-[#4282FA] overflow-hidden animate-fade-in" style={{background:'#141A2E'}}>
+                            {renderPanel(openTile)}
+                        </div>
+                    )}
+                    <p className="text-[11px] text-white/30 text-center mt-4">*הנתונים מבוססים על שקלול מאגרי מידע ואינם מהווים התחייבות לתוצאה כלשהי</p>
+                </div>
+                );
+            };
+
+            const BoardingPass = () => (
+                <div className="w-full rounded-[22px] border border-[#26304D] overflow-hidden" style={{background:'#141A2E',boxShadow:'0 24px 60px rgba(0,0,0,0.5)'}}>
+                    <div style={{padding:'24px 20px',display:'flex',flexDirection:'column',gap:'22px'}}>
+                        <div className="flex items-center justify-between gap-3">
+                            <span className="text-[14px] font-bold text-[#4282FA]">כרטיס עלייה</span>
+                            <img src="public/noBgWhite (1) (2).png" alt="Dollar Academy" style={{width:'116px',height:'auto'}} />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="shrink-0 flex flex-col gap-0.5">
+                                <span className="text-[38px] font-[800] leading-none" style={{fontFamily:'Rubik, sans-serif',direction:'ltr'}}>TLV</span>
+                                <span className="text-[12px] text-[#A9B7DE]">ישראל · היום</span>
+                            </div>
+                            <div className="flex-1 flex items-center gap-2 min-w-0">
+                                <span className="flex-1 border-t-2 border-dashed border-[#2A3556]"></span>
+                                <span style={{transform:'rotate(-90deg)',flex:'none'}}>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#4282FA"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+                                </span>
+                                <span className="flex-1 border-t-2 border-dashed border-[#2A3556]"></span>
+                            </div>
+                            <div className="shrink-0 flex flex-col gap-0.5" style={{textAlign:'left'}}>
+                                <span className="text-[38px] font-[800] leading-none" style={{fontFamily:'Rubik, sans-serif',direction:'ltr'}}>USA</span>
+                                <span className="text-[12px] text-[#A9B7DE]">ארה״ב · היעד</span>
+                            </div>
+                        </div>
+                        <dl style={{margin:0,paddingTop:'18px',borderTop:'1px solid #26304D',display:'flex',flexDirection:'column',gap:'12px'}}>
+                            <div className="flex items-baseline justify-between gap-3">
+                                <dt className="text-[13px] font-semibold text-[#8A97BE]">נוסע</dt>
+                                <dd className="m-0 text-[15px] font-bold text-[#F4F6FC]">{avatarCtx.name || '—'}</dd>
+                            </div>
+                            <div className="flex items-baseline justify-between gap-3">
+                                <dt className="text-[13px] font-semibold text-[#8A97BE]">פרופיל</dt>
+                                <dd className="m-0 text-[15px] font-bold text-[#F4F6FC]">{ticketData.label}</dd>
+                            </div>
+                            <div className="flex items-baseline justify-between gap-3">
+                                <dt className="text-[13px] font-semibold text-[#8A97BE]">יעד חודשי</dt>
+                                <dd className="m-0 text-[17px] font-[800] text-[#F4F6FC]" style={{fontFamily:'Rubik, sans-serif',direction:'ltr',unicodeBidi:'isolate'}}>{avatarCtx.mappedIncome}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div className="relative" style={{height:0}}>
+                        <span style={{position:'absolute',top:'-16px',right:'-1px',width:'16px',height:'32px',boxSizing:'border-box',background:'#0A0D18',border:'1px solid #26304D',borderRight:'none',borderRadius:'32px 0 0 32px'}}></span>
+                        <span style={{position:'absolute',top:'-1px',right:'28px',left:'28px',borderTop:'2px dashed #2A3556'}}></span>
+                        <span style={{position:'absolute',top:'-16px',left:'-1px',width:'16px',height:'32px',boxSizing:'border-box',background:'#0A0D18',border:'1px solid #26304D',borderLeft:'none',borderRadius:'0 32px 32px 0'}}></span>
+                    </div>
+                    <div style={{padding:'22px 20px 20px',background:'#10162A',borderRadius:'0 0 21px 21px',display:'flex',flexDirection:'column',gap:'12px'}}>
+                        <span className="text-[13px] font-bold tracking-wide text-[#4282FA]">מסלול הטיסה</span>
+                        <div className="flex items-center gap-1.5">
+                            {ticketData.stops.map((s, i) => (
+                                <React.Fragment key={i}>
+                                    <span className="shrink-0 text-[12px] font-semibold" style={{fontFamily:"'IBM Plex Mono', ui-monospace, Menlo, monospace",direction:'ltr',unicodeBidi:'isolate',color: s.code === 'USA' ? '#F4F6FC' : '#8A97BE'}}>{s.code}</span>
+                                    {i < ticketData.stops.length - 1 && <span className="flex-1 border-t-2 border-dotted border-[#2A3556]"></span>}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const FlightRoute = () => {
+                const renderStop = (stop, idx) => {
+                    const label = stopLabels[stop.code] || stop.code;
+                    const isUSA = stop.code === 'USA';
+                    const dotColor = (isUSA || stop.code === 'ARRIVED') ? '#4282FA' : '#2A3556';
+                    if (stop.wa) {
+                        const wa = TRAINING_TICKET.waCards[stop.wa];
+                        return (
+                            <div key={idx} className="relative flex flex-col gap-2.5">
+                                <span style={{position:'absolute',top:'3px',insetInlineStart:'-32px',width:'18px',height:'18px',boxSizing:'border-box',borderRadius:'50%',background:'#0A0D18',border:'2px solid #4282FA'}}></span>
+                                <div className="flex items-baseline gap-2.5">
+                                    <span className="text-[13px] font-semibold text-[#4282FA]" style={{fontFamily:"'IBM Plex Mono', ui-monospace, Menlo, monospace",direction:'ltr',unicodeBidi:'isolate'}}>{stop.code}</span>
+                                    <span className="text-[13px] font-bold text-[#8A97BE]">{label}</span>
+                                </div>
+                                {wa && (
+                                    <figure className="m-0 flex flex-col gap-2.5">
+                                        <img src={wa.img} alt={wa.name} className="w-full rounded-2xl" style={{boxShadow:'0 24px 60px rgba(0,0,0,0.5)'}} loading="lazy" />
+                                        <figcaption className="flex flex-col gap-0.5">
+                                            <span className="text-[19px] font-[800] leading-[1.3]" style={{fontFamily:'Rubik, sans-serif'}}>{wa.summary}</span>
+                                            <span className="text-[13px] text-[#8A97BE]">{wa.name} · {wa.role || 'לקוח ליווי'} · ישר מהוואטסאפ</span>
+                                        </figcaption>
+                                    </figure>
+                                )}
+                            </div>
+                        );
+                    }
+                    const paraContent = avatarCopy.part2[stop.para - 1];
+                    return (
+                        <div key={idx} className="relative flex flex-col gap-2.5">
+                            <span style={{position:'absolute',top:'3px',insetInlineStart:'-32px',width:'18px',height:'18px',boxSizing:'border-box',borderRadius:'50%',background:'#0A0D18',border:`2px solid ${dotColor}`}}></span>
+                            <div className="flex items-baseline gap-2.5">
+                                <span className="text-[13px] font-semibold text-[#4282FA]" style={{fontFamily:"'IBM Plex Mono', ui-monospace, Menlo, monospace",direction:'ltr',unicodeBidi:'isolate'}}>{stop.code}</span>
+                                <span className="text-[13px] font-bold text-[#8A97BE]">{label}</span>
+                            </div>
+                            {stop.big && <h3 className="m-0 text-[25px] font-[800] leading-[1.25]" style={{fontFamily:'Rubik, sans-serif',textWrap:'balance'}}>{stop.big.map((seg, si) => <span key={si} style={{color: seg[1] === 'g' ? '#4282FA' : seg[1] === 'r' ? '#FFFFFF' : 'inherit', fontWeight: seg[1] ? 800 : 'inherit'}}>{seg[0]}</span>)}</h3>}
+                            {isUSA && (
                                 <>
-                                    <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight text-center mb-2">רגע לפני שממשיכים, חובה לצפות בזה.</h1>
-                                    <div className="space-y-4 mb-8"><p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed text-center font-normal">עכשיו אנחנו צוללים לפרקטיקה: איך מחברים את הכל למערכת שעובדת עבורך ומייצרת הכנסה דולרית יציבה.</p></div>
+                                    <span className="text-[44px] font-[800] leading-[1.05]" style={{fontFamily:'Rubik, sans-serif',direction:'ltr',textAlign:'right'}}>{avatarCtx.mappedIncome}</span>
+                                    <span className="text-[18px] font-bold text-[#4282FA] -mt-1.5" style={{fontFamily:'Rubik, sans-serif'}}>בחודש</span>
                                 </>
                             )}
+                            {paraContent && <p className="m-0 text-[17px] leading-[1.75] text-[#C9D2EC]">{paraContent}</p>}
+                        </div>
+                    );
+                };
+                return (
+                    <section style={{position:'relative',margin:'44px 0 0',paddingInlineStart:'34px'}}>
+                        <span style={{position:'absolute',top:'8px',bottom:'16px',insetInlineStart:'9px',borderInlineStart:'2px dashed #2A3556'}}></span>
+                        <div className="flex flex-col gap-10" style={{paddingInlineStart:0}}>
+                            {ticketData.stops.map((s, i) => renderStop(s, i))}
+                        </div>
+                    </section>
+                );
+            };
+
+            return (
+                <>
+                    <div className="flex flex-col w-full fade-enter fade-enter-active lg:items-center lg:px-5 lg:pt-16" style={{paddingTop:'24px',paddingBottom:'80px'}}>
+                        <div className="flex flex-col lg:max-w-4xl lg:w-full lg:mx-auto">
+                            {stage === 1 ? (
+                                avatarCopy.part1
+                            ) : (
+                                <>
+                                    <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight text-center" style={{margin:'26px 20px 0'}}>רגע לפני שממשיכים, חובה לצפות בזה.</h1>
+                                    <p className="text-[17px] lg:text-[19px] text-[#A9B7DE] lg:max-w-3xl mx-5 lg:mx-auto leading-relaxed text-center" style={{marginTop:'18px',marginBottom:'26px'}}>עכשיו אנחנו צוללים לפרקטיקה: איך מחברים את הכל למערכת שעובדת עבורך ומייצרת הכנסה דולרית יציבה.</p>
+                                </>
+                            )}
+                            <div style={{margin:'0 16px'}}>
                             <div className="video-wrapper">
-                                <iframe 
-                                    src={`https://www.youtube.com/embed/${(stage === 1 || stage === 'bridge') ? video1Id : video2Id}?autoplay=${stage === 'bridge' ? 0 : 1}&modestbranding=1&rel=0&showinfo=0`} 
-                                    frameBorder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                <iframe
+                                    ref={iframeRef}
+                                    src={`https://www.youtube.com/embed/${(stage === 1 || stage === 'bridge') ? video1Id : video2Id}?autoplay=${stage === 'bridge' ? 0 : 1}&modestbranding=1&rel=0&showinfo=0`}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                                     allowFullScreen
                                 ></iframe>
                             </div>
-                            {!showBtn && (stage === 1 || stage === 2) && (
-                                <div className="w-full max-w-md mx-auto mt-6 mb-2 fade-enter fade-enter-active">
-                                    <div className="flex justify-center items-center gap-1.5 text-[9px] xs:text-[11px] md:text-sm text-white/75 font-bold mb-2 text-center whitespace-nowrap">
-                                        <span className="w-2 h-2 bg-[#fbbf24] rounded-full animate-pulse shrink-0"></span>
-                                        השלב הבא יפתח בעוד {`0:${String(secondsLeft).padStart(2, '0')}`} — כדאי לצפות בהדרכה עד הסוף, יש הרבה ערך
+                            </div>
+                            <button onClick={requestFullscreen} className="mx-auto inline-flex items-center gap-2 cursor-pointer hover:bg-white/5 transition-colors" style={{alignSelf:'center',margin:'12px 0 0',minHeight:'44px',padding:'0 18px',borderRadius:'999px',border:'1px solid #2E3B66',background:'transparent',color:'#C9D2EC',fontFamily:'Assistant, sans-serif',fontSize:'14px',fontWeight:700}}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+                                צפייה במסך מלא
+                            </button>
+
+                            {showBtn && stage === 1 && (
+                                <div className="fade-enter fade-enter-active flex flex-col">
+                                    <div className="inline-flex items-center gap-2 bg-[#2E59F4]/15 border border-[#2E59F4]/30 text-[#4282FA] font-bold text-xs px-4 py-1.5 rounded-full" style={{alignSelf:'center',margin:'18px 0 0'}}>
+                                        <span className="w-2 h-2 bg-[#4282FA] rounded-full animate-pulse"></span>
+                                        השלב הבא נפתח לך
                                     </div>
-                                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                        <div className="h-full bg-[#fbbf24] transition-all duration-1000 ease-linear" style={{ width: `${(((stage === 2 ? 20 : 30) - secondsLeft) / (stage === 2 ? 20 : 30)) * 100}%` }}></div>
+                                    <div style={{margin:'14px 16px 0'}}>
+                                        <button onClick={handleBridgeTransition} disabled={isSubmitting} className="w-full text-white font-bold text-[18px] cursor-pointer active:scale-95 transition-all" style={{minHeight:'58px',borderRadius:'999px',border:'none',background:'#2E59F4',fontFamily:'Rubik, sans-serif',fontWeight:700,boxShadow:'0 12px 36px rgba(46,89,244,0.45)'}}>
+                                            {bridgeBtnText}
+                                        </button>
                                     </div>
                                 </div>
                             )}
-                            <div className="flex flex-col items-center gap-10 w-full">
-                                {showBtn && (
-                                    <div className="fade-enter fade-enter-active w-full flex flex-col items-center gap-8">
-                                        {stage === 1 ? (
-                                            <>
-                                                <button onClick={handleBridgeTransition} disabled={isSubmitting} className="cta-glow bg-cta text-white font-extrabold text-[4.2vw] xs:text-[3.8vw] md:text-3xl py-6 px-8 md:px-16 rounded-full shadow-2xl hover:bg-blue-600 active:scale-95 transition-all duration-300 transform hover:-translate-y-1 relative z-10 whitespace-nowrap overflow-hidden text-ellipsis">
-                                                    {bridgeBtnText}
-                                                </button>
-                                                <div className="max-w-2xl w-full mx-auto flex flex-col items-center gap-4" style={{ color: 'white' }}>
-                                                    {avatarCopy.part2.map((block, bi) => (
-                                                        <div key={bi} className="w-full bg-white/[0.04] border border-white/10 rounded-2xl p-5 md:p-7 shadow-lg">{block}</div>
-                                                    ))}
-                                                </div>
-                                                <button onClick={handleBridgeTransition} disabled={isSubmitting} className="cta-glow bg-cta text-white font-extrabold text-[4.2vw] xs:text-[3.8vw] md:text-3xl py-6 px-8 md:px-16 rounded-full shadow-2xl hover:bg-blue-600 active:scale-95 transition-all duration-300 transform hover:-translate-y-1 relative z-10 whitespace-nowrap overflow-hidden text-ellipsis">
-                                                    {bridgeBtn2Text}
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <a href="#/booking" className="cta-glow inline-block bg-cta text-white font-extrabold text-lg md:text-2xl py-5 px-8 md:px-12 rounded-full shadow-xl hover:bg-blue-600 active:scale-95 transition-all duration-300 transform hover:-translate-y-1 text-center">עכשיו אני מבין, קח אותי לקביעת שיחה</a>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
+                            {showBtn && stage === 2 && (
+                                <div className="fade-enter fade-enter-active flex flex-col" style={{margin:'18px 0 0'}}>
+                                    <a href="#/booking" className="cta-glow inline-block bg-cta text-white font-extrabold text-lg md:text-2xl py-5 px-8 md:px-12 rounded-full shadow-xl hover:bg-blue-600 active:scale-95 transition-all duration-300 transform hover:-translate-y-1 text-center">עכשיו אני מבין, קח אותי לקביעת שיחה</a>
+                                    <StoriesLink />
+                                </div>
+                            )}
                         </div>
+
+                        {showBtn && stage === 2 && <WhyUsaSection />}
+
+                        {showBtn && stage === 2 && (
+                            <div className="w-full pb-16 fade-enter fade-enter-active">
+                                <SlideCTA onComplete={() => { window.location.hash = '#/booking'; }} />
+                            </div>
+                        )}
+
+                        {showBtn && stage === 1 && (
+                            <div className="max-w-[1160px] w-full fade-enter fade-enter-active lg:mx-auto" style={{margin:'36px 0 0',padding:'0 20px'}}>
+                                <div className="text-center mb-2 flex flex-col items-center">
+                                    <span className="text-[14px] font-bold text-[#4282FA]">הצעד הבא</span>
+                                    <h2 className="text-[26px] lg:text-[30px] font-[800] text-white mt-2 leading-[1.2] text-center" style={{fontFamily:'Rubik, sans-serif'}}>הכרטיס שלך לשוק האמריקאי</h2>
+                                </div>
+
+                                {/* Desktop: sticky card + route side by side */}
+                                <div className="hidden lg:grid lg:gap-10" style={{gridTemplateColumns:'340px minmax(0,1fr)',alignItems:'start'}}>
+                                    <div className="sticky top-6"><BoardingPass /></div>
+                                    <FlightRoute />
+                                </div>
+                                {/* Mobile: card then route stacked */}
+                                <div className="lg:hidden flex flex-col">
+                                    <BoardingPass />
+                                    <FlightRoute />
+                                </div>
+
+                                <button onClick={handleBridgeTransition} disabled={isSubmitting} className="w-full text-white cursor-pointer active:scale-95 transition-all mt-8 mb-4" style={{minHeight:'60px',borderRadius:'16px',border:'none',background:'#2E59F4',fontFamily:'Rubik, sans-serif',fontSize:'18px',fontWeight:800,boxShadow:'0 16px 44px rgba(46,89,244,0.4)'}}>
+                                    {bridgeBtn2Text}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {stage === 'bridge' && (
@@ -903,128 +1931,497 @@
             );
         };
 
-        const LandingPage = ({ onStartQuiz }) => (
-            <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 fade-enter fade-enter-active w-full">
-                <div className="max-w-3xl w-full text-center space-y-8 center-all">
-                    <h1 className="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white text-center">
-                        הדרך המוכחת לייצר <span className="font-bold text-highlight">משכורת הייטק בדולרים</span> מהלפטופ, מכל מקום בעולם
-                    </h1>
-                    <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto leading-relaxed text-center">
-                        גלה את המודל העסקי שמאפשר לישראלים לנצל את פערי המטבע, לעבוד מכל מקום בעולם ולבנות נכס דיגיטלי שמניב רווחים במטבע החזק בעולם. בלי בוס על הראש ובלי תקרת זכוכית — גם אם אין לך ניסיון קודם או אנגלית מושלמת.
-                    </p>
-                    <div className="pt-6 w-full flex justify-center">
-                        <button 
-                            onClick={onStartQuiz}
-                            className="cta-glow bg-cta text-white font-extrabold text-xl md:text-2xl py-5 px-8 md:px-12 rounded-full shadow-xl hover:bg-blue-600 active:scale-95 transition-all duration-300 transform hover:-translate-y-1 text-center"
-                        >
-                            התאם לי את ההדרכה האישית
-                        </button>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2.5 mt-8 w-full">
-                        <div className="bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2 text-white text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap">
-                            <span className="w-4 h-4 bg-cta text-white rounded-full flex items-center justify-center text-[10px]">✓</span>
-                            בדיקה חינמית
-                        </div>
-                        <div className="bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2 text-white text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap">
-                            <span className="w-4 h-4 bg-cta text-white rounded-full flex items-center justify-center text-[10px]">✓</span>
-                            מותאם אישית
-                        </div>
-                        <div className="bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2 text-white text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap">
-                            <span className="w-4 h-4 bg-cta text-white rounded-full flex items-center justify-center text-[10px]">✓</span>
-                            10 שאלות קצרות
-                        </div>
-                    </div>
-                </div>
+        const LandingQuotes = () => (
+            <div className="flex flex-col gap-5 mt-3">
+                {PROOF.landingQuotes.map((q, i) => {
+                    const p = PROOF.people[q.person];
+                    return (
+                        <figure key={i} className="flex items-start gap-3 m-0">
+                            {p && p.face && <img src={p.face} alt={p.name} className="flex-none w-[46px] h-[46px] rounded-full object-cover" loading="lazy" />}
+                            <span className="flex flex-col gap-1">
+                                <blockquote className="m-0 text-[15px] lg:text-[17px] leading-relaxed text-[#DCE3F5]">"{q.text}"</blockquote>
+                                <figcaption className="text-sm font-bold text-[#4282FA]">{p ? p.name : ''}</figcaption>
+                            </span>
+                        </figure>
+                    );
+                })}
             </div>
         );
 
-        const QuizPage = ({ step, leadData, onChoice, onNext, onPrev, inputValue, setInputValue, errorMsg, inputRef, pickResetKey }) => {
+        const LandingPage = ({ onStartQuiz }) => {
+            const waMessages = PROOF.whatsappLanding.then.map(k => PROOF.whatsappMessages[k]);
+            const galNote = PROOF.voiceNotes[0];
+
+            return (
+                <div className="flex flex-col items-center w-full fade-enter fade-enter-active">
+
+                    {/* ── Hero (mobile: stacked, desktop: 2-col with quote rotator) ── */}
+                    <div className="w-full" style={{minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'48px 20px'}}>
+                        <div className="w-full max-w-[1160px]">
+                            {/* Desktop: 2-column grid */}
+                            <div className="hidden lg:grid lg:gap-16" style={{gridTemplateColumns:'minmax(0,1.1fr) minmax(0,0.9fr)',alignItems:'center'}}>
+                                <div className="flex flex-col items-start gap-5">
+                                    <h1 className="text-[54px] font-extrabold leading-[1.14] text-white m-0" style={{textWrap:'balance'}}>
+                                        הדרך המוכחת לייצר <span style={{color:'#2E6BFF'}}>משכורת הייטק בדולרים</span> מהלפטופ, מכל מקום בעולם
+                                    </h1>
+                                    <p className="text-[19px] leading-[1.65] text-[#A9B7DE] m-0 max-w-[580px]">גלה את המודל העסקי שמאפשר לישראלים לנצל את פערי המטבע, לעבוד מכל מקום בעולם ולבנות נכס דיגיטלי שמניב רווחים במטבע החזק בעולם. בלי בוס על הראש ובלי תקרת זכוכית — גם אם אין לך ניסיון קודם או אנגלית מושלמת.</p>
+                                    <button onClick={onStartQuiz} className="inline-flex items-center justify-center px-12 border-none rounded-full bg-[#2E59F4] text-white font-bold text-xl cursor-pointer" style={{minHeight:'64px',fontFamily:'Rubik, sans-serif',boxShadow:'0 14px 40px rgba(46,89,244,0.42)'}}>התאם לי את ההדרכה האישית ←</button>
+                                    <ul className="flex flex-wrap gap-y-2 gap-x-5 text-[15px] font-semibold text-[#C9D2EC] p-0 m-0 list-none">
+                                        {['בדיקה חינמית','מותאם אישית','10 שאלות קצרות'].map(t => (
+                                            <li key={t} className="flex items-center gap-1.5"><span style={{color:'#2E6BFF'}}>✓</span>{t}</li>
+                                        ))}
+                                    </ul>
+                                    <ProofFacePile />
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <SectionLabel num="01" text="במילים שלהם" />
+                                    <QuoteRotator quoteKeys={PROOF.quoteRotationLanding} />
+                                </div>
+                            </div>
+
+                            {/* Mobile: stacked */}
+                            <div className="lg:hidden flex flex-col items-center text-center space-y-6">
+                                <h1 className="text-[32px] font-extrabold leading-[1.2] text-white m-0" style={{textWrap:'balance'}}>
+                                    הדרך המוכחת לייצר <span style={{color:'#2E6BFF'}}>משכורת הייטק בדולרים</span> מהלפטופ, מכל מקום בעולם
+                                </h1>
+                                <p className="text-base leading-relaxed text-[#A9B7DE] m-0">גלה את המודל העסקי שמאפשר לישראלים לנצל את פערי המטבע, לעבוד מכל מקום בעולם ולבנות נכס דיגיטלי שמניב רווחים במטבע החזק בעולם. בלי בוס על הראש ובלי תקרת זכוכית — גם אם אין לך ניסיון קודם או אנגלית מושלמת.</p>
+                                <button onClick={onStartQuiz} className="w-full border-none rounded-full bg-[#2E59F4] text-white font-bold text-[19px] cursor-pointer" style={{minHeight:'60px',fontFamily:'Rubik, sans-serif',boxShadow:'0 12px 36px rgba(46,89,244,0.45)'}}>התאם לי את ההדרכה האישית ←</button>
+                                <ul className="flex flex-wrap justify-center gap-y-2 gap-x-4 text-[13px] font-semibold text-[#C9D2EC] p-0 m-0 list-none">
+                                    {['בדיקה חינמית','מותאם אישית','10 שאלות קצרות'].map(t => (
+                                        <li key={t} className="flex items-center gap-1.5"><span style={{color:'#2E6BFF'}}>✓</span>{t}</li>
+                                    ))}
+                                </ul>
+                                <ProofFacePile />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── בסרטונים (mobile: 01, desktop: 02) ── */}
+                    <section className="proof-section flex flex-col gap-3.5">
+                        <span className="lg:hidden"><SectionLabel num="01" text="בסרטונים" /></span>
+                        <span className="hidden lg:inline"><SectionLabel num="02" text="בסרטונים" /></span>
+                        <h2 className="text-2xl lg:text-4xl font-extrabold text-white m-0" style={{lineHeight:'1.25'}}>קצת דברים מהשטח</h2>
+
+                        {/* Desktop: video+heads left, quotes right */}
+                        <div className="hidden lg:grid lg:gap-10" style={{gridTemplateColumns:'minmax(0,1.5fr) minmax(0,1fr)',alignItems:'start'}}>
+                            <InlineVideoPlayer />
+                            <LandingQuotes />
+                        </div>
+                        {/* Mobile: stacked */}
+                        <div className="lg:hidden flex flex-col gap-5">
+                            <InlineVideoPlayer />
+                            <LandingQuotes />
+                        </div>
+
+                        <button onClick={onStartQuiz} className="self-center border-none rounded-full bg-[#2E59F4] text-white font-bold text-lg lg:text-xl cursor-pointer px-8 lg:px-12 mt-2" style={{minHeight:'58px',fontFamily:'Rubik, sans-serif',boxShadow:'0 12px 36px rgba(46,89,244,0.45)'}}>התאם לי את ההדרכה האישית ←</button>
+                    </section>
+
+                    {/* ── 02/03 · במילים שלהם (mobile only — desktop has it in hero) ── */}
+                    <section className="proof-section flex flex-col gap-4 lg:hidden">
+                        <SectionLabel num="02" text="במילים שלהם" />
+                        <h2 className="text-2xl font-extrabold text-white m-0 leading-tight" style={{textWrap:'balance'}}>מה אומרים מי שכבר פרצו איתנו לשוק האמריקאי</h2>
+                        <QuoteRotator quoteKeys={PROOF.quoteRotationLanding} />
+                    </section>
+
+                    {/* ── ישר מהוואטסאפ (mobile: 03, desktop: 03) ── */}
+                    <section className="proof-section flex flex-col gap-4">
+                        <SectionLabel num="03" text="ישר מהוואטסאפ" />
+                        <h2 className="text-2xl lg:text-4xl font-extrabold text-white m-0 leading-tight" style={{textWrap:'balance'}}>ההודעות וההקלטות שתלמידי הליווי שולחים לנו</h2>
+
+                        {/* Mobile: horizontal carousel */}
+                        <div className="w-full lg:hidden -mx-5" style={{width:'calc(100% + 40px)'}}>
+                            <div className="flex gap-3 overflow-x-auto pb-4 px-5 snap-x snap-mandatory" style={{WebkitOverflowScrolling:'touch',scrollbarWidth:'none'}}>
+                                <div className="shrink-0 w-[262px] snap-start"><VoiceNoteCard note={galNote} /></div>
+                                {waMessages.map((msg, i) => (
+                                    <div key={i} className="snap-start"><WhatsAppCard msg={msg} /></div>
+                                ))}
+                            </div>
+                            <p className="text-[#8A97BE] text-xs px-5 mt-1">החליקו לעוד הודעות. הקלטות וצילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.</p>
+                        </div>
+
+                        {/* Desktop: voice note left + 3-col grid */}
+                        <div className="hidden lg:grid lg:gap-5" style={{gridTemplateColumns:'300px minmax(0,1fr)',alignItems:'start'}}>
+                            <VoiceNoteCard note={galNote} />
+                            <div className="grid grid-cols-3 gap-4 auto-rows-min">
+                                {waMessages.map((msg, i) => (
+                                    <WhatsAppCard key={i} msg={msg} />
+                                ))}
+                            </div>
+                        </div>
+                        <p className="hidden lg:block text-[#8A97BE] text-[13px]">הקלטות וצילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.</p>
+                    </section>
+
+                    {/* ── Final CTA + TrustLine ── */}
+                    <div className="proof-section flex flex-col items-center gap-5 pb-12">
+                        <button onClick={onStartQuiz} className="border-none rounded-full bg-[#2E59F4] text-white font-bold text-[19px] lg:text-xl cursor-pointer px-8 lg:px-12" style={{minHeight:'60px',fontFamily:'Rubik, sans-serif',boxShadow:'0 14px 40px rgba(46,89,244,0.42)'}}>התאם לי את ההדרכה האישית ←</button>
+                        <TrustLine />
+                    </div>
+                </div>
+            );
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ Flight visual layer — helper functions
+        // ═══════════════════════════════════════════════════════════════
+        const FL_PLANE_SVG = React.createElement('svg', { width: 13, height: 13, viewBox: '0 0 24 24', fill: '#FFFFFF', 'aria-hidden': true }, React.createElement('path', { d: 'M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z' }));
+        const FL_CHECK_SVG = (size, stroke) => React.createElement('svg', { 'aria-hidden': true, width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: stroke || '#FFFFFF', strokeWidth: 3.2, strokeLinecap: 'round', strokeLinejoin: 'round' }, React.createElement('path', { d: 'M20 6 9 17l-5-5' }));
+
+        // Resolve ticket field values from leadData
+        function flTicketValues(leadData, currentInputValue, currentStep) {
+            const vals = {};
+            FLIGHT_DATA.ticket_fields.forEach((tf, qi) => {
+                if (!tf) return;
+                const qId = quizQuestions[qi].id;
+                const rawVal = leadData[qId];
+                if (tf.key === 'name') {
+                    // For name, use current input if on Q7, otherwise use stored
+                    const nameVal = (currentStep === 6 ? currentInputValue : (leadData.firstName || '')).trim();
+                    if (nameVal) vals.name = nameVal;
+                } else if (rawVal && tf.values) {
+                    const mapped = tf.values[rawVal];
+                    if (mapped) vals[tf.key] = mapped;
+                }
+            });
+            return vals;
+        }
+
+        // Count answered questions from leadData
+        function flAnsweredCount(leadData) {
+            let count = 0;
+            for (let i = 0; i < quizQuestions.length; i++) {
+                const qId = quizQuestions[i].id;
+                if (leadData[qId] !== undefined && leadData[qId] !== '' && leadData[qId] !== null) count++;
+                else break; // stop at first unanswered
+            }
+            return count;
+        }
+
+        // Get stage name for a given quiz step
+        function flStageName(step) {
+            if (step <= 2) return 'צ׳ק-אין';
+            if (step <= 5) return 'ביקורת דרכונים';
+            return 'שער העלייה';
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ Proof components
+        // ═══════════════════════════════════════════════════════════════
+        const FlProof = ({ step }) => {
+            const proof = FLIGHT_DATA.proofs[step];
+            if (!proof) return null;
+
+            if (proof.type === 'quote') {
+                return (
+                    <div className="fl-pq">
+                        <span className="fl-face" aria-hidden="true" style={{ backgroundPosition: proof.fpos }}></span>
+                        <span className="fl-pq__body">
+                            <span className="fl-pq__text">"{proof.quote}"</span>
+                            <span className="fl-pq__who">{proof.who}</span>
+                        </span>
+                    </div>
+                );
+            }
+            if (proof.type === 'chat') {
+                return (
+                    <div className="fl-pc">
+                        <span className="fl-pc__head">
+                            <span className="fl-pc__title">{proof.head}</span>
+                            <span className="fl-pc__name">{proof.name}</span>
+                        </span>
+                        <span className="fl-wa" role="img" aria-label={'צילום מסך מוואטסאפ: ' + proof.name + ', ' + proof.head} style={{ aspectRatio: '600 / ' + proof.h, backgroundPosition: '0% ' + proof.y }}></span>
+                    </div>
+                );
+            }
+            if (proof.type === 'faces') return <FlFaces />;
+            if (proof.type === 'trust') return <FlTrust />;
+            return null;
+        };
+
+        const FlFaces = () => (
+            <div className="fl-pf">
+                <span className="fl-pf__faces" aria-hidden="true">
+                    {FLIGHT_DATA.faces_positions.map((p, i) => <span key={i} className="fl-face" style={{ backgroundPosition: p }}></span>)}
+                </span>
+                <span className="fl-pf__text"><b><span className="fl-ltr">+100</span> תלמידים</b> שכבר מרוויחים בדולר</span>
+            </div>
+        );
+
+        const FlTrust = () => (
+            <ul className="fl-trust" aria-label="על האקדמיה">
+                <li><span className="fl-trust__icon" aria-hidden="true">★</span><span className="fl-ltr">+100</span> תלמידים שכבר מרוויחים בדולר</li>
+                <li><span className="fl-trust__icon" aria-hidden="true">✓</span><span className="fl-ltr">+8</span> שנים בשוק האמריקאי</li>
+                <li><span className="fl-trust__icon" aria-hidden="true">✓</span><span className="fl-ltr">$10M</span> הכנסות מנוהלות</li>
+            </ul>
+        );
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ BoardingPass component
+        // ═══════════════════════════════════════════════════════════════
+        const BoardingPass = ({ leadData, answeredCount, freshField, isPrint, printTime, inputValue, currentStep }) => {
+            const prevValsRef = useRef({});
+            const stampedRef = useRef(new Set());
+            const pct = isPrint
+                ? 90 + Math.min(1, (printTime || 0) / 4000) * 10
+                : (FLIGHT_DATA.plane_pct[answeredCount] || 6);
+            const planePct = Math.min(pct, FLIGHT_DATA.plane_max);
+            const vals = flTicketValues(leadData, inputValue || '', currentStep || 0);
+            const litBars = isPrint ? 44 : Math.min(44, 4 + answeredCount * 4);
+            const showIssued = isPrint && (printTime || 0) >= 4400;
+
+            // Track which fields just got stamped (for animation)
+            const justStamped = useRef(new Set());
+            const prevVals = prevValsRef.current;
+            justStamped.current = new Set();
+            FLIGHT_DATA.field_order.forEach(f => {
+                const v = vals[f.key] || '';
+                const pv = prevVals[f.key] || '';
+                if (v && v !== pv) {
+                    // new value or changed value — stamp it
+                    if (f.key === 'name') {
+                        // Name: stamp only on first character
+                        if (!stampedRef.current.has('name')) {
+                            justStamped.current.add('name');
+                            stampedRef.current.add('name');
+                        }
+                    } else {
+                        justStamped.current.add(f.key);
+                    }
+                }
+            });
+            // Update prev vals after render comparison
+            useEffect(() => {
+                prevValsRef.current = { ...vals };
+            });
+
+            return (
+                <section className="fl-ticket" aria-label="כרטיס העלייה שלך">
+                    <div className="fl-ticket__top">
+                        <div className="fl-ticket__head">
+                            <span className="fl-ticket__label">כרטיס עלייה</span>
+                            <img className="fl-ticket__logo" src="quiz-flight-upgrade/assets/logo-dollar-academy.png" alt="Dollar Academy" />
+                        </div>
+                        <div className="fl-route">
+                            <span className="fl-route__code fl-route__code--from fl-mono">TLV</span>
+                            <div className="fl-track" role="progressbar" aria-label="ההתקדמות בשאלון" aria-valuemin="0" aria-valuemax="10" aria-valuenow={answeredCount}>
+                                <span className="fl-track__dash" aria-hidden="true"></span>
+                                <span className="fl-track__fill fl-glide" aria-hidden="true" style={{ width: pct + '%' }}></span>
+                                {FLIGHT_DATA.stations.map((s, i) => (
+                                    <span key={i} className={'fl-station' + (pct >= s.at - 0.01 ? ' is-on' : '')} style={{ '--at': s.at + '%' }} aria-hidden="true">
+                                        <span className="fl-station__dot"></span>
+                                        <span className="fl-station__label">{s.label}</span>
+                                    </span>
+                                ))}
+                                <span className="fl-plane fl-glide" aria-hidden="true" style={{ right: planePct + '%' }}>{FL_PLANE_SVG}</span>
+                            </div>
+                            <span className="fl-route__code fl-mono">USA</span>
+                        </div>
+                    </div>
+                    <div className="fl-perf" aria-hidden="true">
+                        <span className="fl-perf__notch fl-perf__notch--r"></span>
+                        <span className="fl-perf__line"></span>
+                        <span className="fl-perf__notch fl-perf__notch--l"></span>
+                    </div>
+                    <div className="fl-stub">
+                        <dl className="fl-fields">
+                            {FLIGHT_DATA.field_order.map(f => {
+                                const v = vals[f.key] || '';
+                                const isFresh = freshField === f.key && !!v;
+                                const needsStamp = justStamped.current.has(f.key);
+                                const dir = v.charAt(0) === '$' ? 'ltr' : 'rtl';
+                                return (
+                                    <div key={f.key} className={'fl-field' + (isFresh ? ' is-fresh' : '')} data-k={f.key}>
+                                        <dt>{f.label}</dt>
+                                        <dd>
+                                            {v ? (
+                                                <span className={'fl-field__value' + (needsStamp ? ' fl-stamp' : '')} dir={dir}>{v}</span>
+                                            ) : (
+                                                <span className="fl-field__empty">{'—'}</span>
+                                            )}
+                                        </dd>
+                                    </div>
+                                );
+                            })}
+                        </dl>
+                        <div className="fl-barrow">
+                            <div className="fl-barcode" aria-hidden="true">
+                                {FLIGHT_DATA.barcode_widths.map((w, i) => (
+                                    <span key={i} className={'fl-bar' + (i < litBars ? ' is-on' : '')} style={{ width: w + 'px' }}></span>
+                                ))}
+                            </div>
+                            <span className="fl-count fl-mono">{answeredCount}/10</span>
+                        </div>
+                    </div>
+                    {showIssued ? (
+                        <span className="fl-issued">{FL_CHECK_SVG(14, '#4ADE80')} הכרטיס הונפק</span>
+                    ) : null}
+                </section>
+            );
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ StageScreen component (shown after Q3 and Q6)
+        // ═══════════════════════════════════════════════════════════════
+        const FlStageScreen = ({ stageIdx, leadData, onContinue }) => {
+            const screen = FLIGHT_DATA.stage_screens[stageIdx];
+            const vals = flTicketValues(leadData, '', 99);
+            const timerRef = useRef(null);
+
+            useEffect(() => {
+                timerRef.current = setTimeout(() => { onContinue(); }, 2600);
+                return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+            }, []);
+
+            const handleClick = () => {
+                if (timerRef.current) clearTimeout(timerRef.current);
+                onContinue();
+            };
+
+            // Build personalized text
+            let text;
+            if (stageIdx === 0) {
+                // After Q3: goal text
+                const goal = vals.goal || '';
+                if (goal.charAt(0) === '$') {
+                    text = <span>היעד שלך, <span className="fl-num">{goal}</span> בחודש, כבר נחתם על הכרטיס. עכשיו שלוש שאלות על הנקודה שממנה אתה ממריא.</span>;
+                } else {
+                    text = <span>היעד שלך כבר נחתם על הכרטיס. עכשיו שלוש שאלות על הנקודה שממנה אתה ממריא.</span>;
+                }
+            } else {
+                // After Q6: profile + time
+                text = <span>הפרופיל שלך נחתם: <b>{vals.prof || ''}</b>, <b>{vals.time || ''}</b> ביום. נשאר להוציא את הכרטיס על שמך: ארבעה פרטים קצרים ואתה בשער.</span>;
+            }
+
+            return (
+                <React.Fragment>
+                    <div className="fl-stage" role="status">
+                        <span className="fl-stage__icon" aria-hidden="true">{FL_CHECK_SVG(28)}</span>
+                        <span className="fl-stage__code fl-mono">{screen.code}</span>
+                        <h2 className="fl-stage__title" tabIndex="-1">{screen.title}</h2>
+                        <p className="fl-stage__text">{text}</p>
+                        <button type="button" className="fl-stage__btn" onClick={handleClick}>
+                            <span className="fl-stage__timer" aria-hidden="true"></span>
+                            <span className="fl-stage__btnlabel">{screen.cta}</span>
+                        </button>
+                    </div>
+                    <FlFaces />
+                </React.Fragment>
+            );
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ QuizPage — flight boarding-pass redesign
+        // ═══════════════════════════════════════════════════════════════
+        const QuizPage = ({ step, leadData, onChoice, onNext, onPrev, inputValue, setInputValue, errorMsg, inputRef, pickResetKey, stageScreen, onStageComplete }) => {
             const q = quizQuestions[step];
             const total = quizQuestions.length;
-            const progressPercentage = Math.round(((step + 1) / total) * 100);
             const [picked, setPicked] = useState(null);
             useEffect(() => { setPicked(null); }, [step, pickResetKey]);
             const handlePick = (val) => {
                 if (picked !== null) return;
                 setPicked(val);
-                setTimeout(() => onChoice(val), 320);
+                setTimeout(() => onChoice(val), 450);
             };
+
+            const answeredCount = flAnsweredCount(leadData);
+            const stageName = flStageName(step);
+
+            // Determine which field was just filled (for "is-fresh" highlight)
+            const freshField = (() => {
+                if (step === 6) return 'name'; // firstName — always fresh while typing
+                const tf = FLIGHT_DATA.ticket_fields[step];
+                return tf ? tf.key : null;
+            })();
+
             return (
-                <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 fade-enter fade-enter-active w-full">
-                    <div className="glass-panel w-full max-w-2xl p-6 md:p-12 rounded-3xl relative">
-                        <div className="mb-8">
-                            <div className="flex justify-between items-center text-sm text-white mb-2 font-bold">
-                                <span className="text-white/80">שאלה {step + 1} מתוך {total}</span>
-                                <span className="text-highlight">{progressPercentage}%</span>
-                            </div>
-                            <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full rounded-full progress-fill" style={{ width: `${progressPercentage}%`, background: 'linear-gradient(90deg, #1f73f7, #5298fa, #4ade80)', boxShadow: '0 0 12px rgba(82,152,250,0.6)' }}></div>
-                            </div>
-                        </div>
-                        <div key={step} className="q-enter min-h-[300px] flex flex-col justify-center items-center center-all">
-                            <h2 className={`font-extrabold text-white text-center leading-snug w-full ${q.subheading ? 'mb-3' : 'mb-8'}`} style={{ fontSize: 'clamp(1.35rem, 5.5vw, 1.875rem)' }}>
-                                {(q.question || '').replace('{name}', leadData.firstName ? ', ' + leadData.firstName : '')}
-                            </h2>
-                            {q.subheading && <p className="text-slate-300 text-center text-base md:text-lg mb-8 max-w-xl leading-relaxed">{q.subheading}</p>}
-                            {q.type === 'input' ? (
-                                <div className="space-y-5 w-full flex flex-col items-center">
-                                    <div className="w-full max-w-sm flex flex-col gap-2">
-                                        {q.label && <label className="text-right text-slate-300 text-sm font-semibold">{q.label}</label>}
-                                        <input
-                                            ref={inputRef}
-                                            type={q.id === 'phone' ? 'text' : (q.id === 'email' ? 'email' : q.inputType)}
-                                            autoComplete={q.id === 'email' ? 'email' : q.id === 'firstName' ? 'name' : q.id === 'phone' ? 'tel' : 'off'}
-                                            inputMode={q.id === 'phone' ? 'numeric' : (q.id === 'email' ? 'email' : (q.inputType === 'number' ? 'numeric' : undefined))}
-                                            value={inputValue}
-                                            onChange={(e) => {
-                                                if (q.id === 'phone') setInputValue(formatPhone(e.target.value));
-                                                else setInputValue(e.target.value);
-                                            }}
-                                            onKeyDown={(e) => e.key === 'Enter' && onNext()}
-                                            placeholder={q.placeholder}
-                                            className="w-full bg-white/10 border-2 border-white/30 focus:border-cta focus:bg-white/20 text-white rounded-xl p-4 text-xl transition-colors text-center"
-                                        />
-                                    </div>
-                                    {q.subtext && <p className="text-white/60 text-xs text-center max-w-sm">{q.subtext}</p>}
-                                    {errorMsg && <div className="w-full text-center"><p className="inline-block text-white bg-red-500 px-4 py-2 rounded-full font-bold text-sm shadow-lg">{errorMsg}</p></div>}
-                                    <button
-                                        onClick={onNext}
-                                        className="cta-glow w-full max-w-sm bg-cta text-white font-bold py-4 px-4 rounded-xl hover:bg-blue-600 active:scale-95 transition-all text-base md:text-lg shadow-lg text-center leading-tight"
-                                    >
-                                        {q.nextLabel || 'המשך'}
-                                    </button>
-                                    {q.footnote && <p className="text-white/50 text-xs text-center max-w-sm leading-relaxed">{q.footnote}</p>}
-                                </div>
+                <div className="fl-page">
+                    <div className="fl-col">
+                        <div className="fl-glow" aria-hidden="true"></div>
+                        <BoardingPass
+                            leadData={leadData}
+                            answeredCount={stageScreen !== null ? (stageScreen === 0 ? 3 : 6) : answeredCount}
+                            freshField={freshField}
+                            isPrint={false}
+                            inputValue={inputValue}
+                            currentStep={step}
+                        />
+                        <span className="fl-sr" id="fl-live" aria-live="polite"></span>
+                        <div className="fl-main">
+                            {stageScreen !== null ? (
+                                <FlStageScreen stageIdx={stageScreen} leadData={leadData} onContinue={onStageComplete} />
                             ) : (
-                                <div className="space-y-4 w-full flex flex-col items-center">
-                                    {q.options.map((opt, i) => {
-                                        const isSelected = picked === opt.value || (picked === null && leadData[q.id] === opt.value);
-                                        return (
-                                            <button
-                                                key={i}
-                                                onClick={() => handlePick(opt.value)}
-                                                disabled={picked !== null}
-                                                className={`w-full max-w-md text-right p-5 pr-6 border-2 rounded-xl transition-all duration-200 flex items-center justify-between gap-3 text-white ${
-                                                    isSelected ? 'bg-cta border-cta shadow-[0_0_22px_rgba(31,115,247,0.55)] scale-[1.02]' : 'bg-white/10 border-white/30 hover:border-cta hover:bg-white/20 active:scale-95'
-                                                }`}
-                                            >
-                                                <div className="flex flex-col items-start">
-                                                    <div className="text-lg md:text-xl font-normal">{opt.label}</div>
-                                                    {opt.subtext && <div className="text-white/80 mt-1 text-sm">{opt.subtext}</div>}
-                                                </div>
-                                                <span className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm transition-all duration-300 ${isSelected ? 'bg-white border-white text-cta scale-100 opacity-100' : 'border-white/40 scale-0 opacity-0'}`}>✓</span>
+                                <React.Fragment>
+                                    <div className="fl-card" key={step}>
+                                        <div className="fl-card__meta">
+                                            <span className="fl-card__stage">{stageName}</span>
+                                            <span className="fl-card__count">שאלה {step + 1} מתוך {total}</span>
+                                        </div>
+                                        <h2 className="fl-q" tabIndex="-1">
+                                            {(q.question || '').replace('{name}', leadData.firstName ? ', ' + leadData.firstName : '')}
+                                        </h2>
+                                        {q.subheading && <p className="fl-sub">{q.subheading}</p>}
+                                        {q.type === 'input' ? (
+                                            <div className="fl-form">
+                                                {q.label ? (
+                                                    <label className="fl-label" htmlFor={'fl-in-' + step}>{q.label}</label>
+                                                ) : (
+                                                    <label className="fl-sr" htmlFor={'fl-in-' + step}>{q.question}</label>
+                                                )}
+                                                <input
+                                                    className="fl-input"
+                                                    id={'fl-in-' + step}
+                                                    ref={inputRef}
+                                                    type={q.id === 'phone' ? 'text' : (q.id === 'email' ? 'email' : q.inputType)}
+                                                    autoComplete={q.id === 'email' ? 'email' : q.id === 'firstName' ? 'name' : q.id === 'phone' ? 'tel' : 'off'}
+                                                    inputMode={q.id === 'phone' ? 'numeric' : (q.id === 'email' ? 'email' : (q.inputType === 'number' ? 'numeric' : undefined))}
+                                                    dir={q.id === 'email' || q.id === 'phone' ? 'ltr' : 'rtl'}
+                                                    value={inputValue}
+                                                    onChange={(e) => {
+                                                        if (q.id === 'phone') setInputValue(formatPhone(e.target.value));
+                                                        else setInputValue(e.target.value);
+                                                    }}
+                                                    onKeyDown={(e) => e.key === 'Enter' && onNext()}
+                                                    placeholder={q.placeholder}
+                                                />
+                                                {step === 6 && <p className="fl-hint">השם יודפס על כרטיס העלייה שלך</p>}
+                                                {q.subtext && step !== 6 && <p className="fl-hint">{q.subtext}</p>}
+                                                {errorMsg && <div style={{ width: '100%', textAlign: 'center' }}><p style={{ display: 'inline-block', color: '#fff', background: '#ef4444', padding: '8px 16px', borderRadius: '9999px', fontWeight: 700, fontSize: '14px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>{errorMsg}</p></div>}
+                                                <button type="button" className="fl-cta" onClick={onNext}>
+                                                    {q.nextLabel || 'המשך'}
+                                                </button>
+                                                {q.footnote && <p className="fl-foot">{q.footnote}</p>}
+                                            </div>
+                                        ) : (
+                                            <div className="fl-options">
+                                                {q.options.map((opt, i) => {
+                                                    const isSelected = picked === opt.value;
+                                                    return (
+                                                        <button
+                                                            key={i}
+                                                            type="button"
+                                                            className={'fl-opt' + (isSelected ? ' is-selected' : '')}
+                                                            onClick={() => handlePick(opt.value)}
+                                                            disabled={picked !== null}
+                                                            aria-pressed={isSelected}
+                                                        >
+                                                            <span className="fl-opt__text">
+                                                                <span className="fl-opt__label">{opt.label}</span>
+                                                                {opt.subtext && <span className="fl-opt__hint" dir={/^[0-9$]/.test(opt.subtext) ? 'ltr' : undefined}>{opt.subtext}</span>}
+                                                            </span>
+                                                            <span className="fl-opt__radio" aria-hidden="true">{FL_CHECK_SVG(12)}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                        {q.note && <p className="fl-note">{q.note}</p>}
+                                        {step > 0 && (
+                                            <button type="button" className="fl-back" onClick={onPrev} disabled={picked !== null}>
+                                                חזור לשאלה הקודמת
                                             </button>
-                                        )
-                                    })}
-                                </div>
-                            )}
-                            {q.note && <p className="text-white/55 text-sm text-center mt-5 max-w-md mx-auto leading-relaxed">{q.note}</p>}
-                             {step > 0 && (
-                                <div className="flex justify-center mt-10 w-full">
-                                    <button onClick={onPrev} disabled={picked !== null} className="text-white/60 text-sm font-normal py-2 px-6 rounded-full hover:text-white hover:shadow-[0_0_15px_rgba(82,152,250,0.4)] transition-all duration-300">
-                                        חזור לשאלה הקודמת
-                                    </button>
-                                </div>
+                                        )}
+                                    </div>
+                                    <FlProof step={step} />
+                                </React.Fragment>
                             )}
                         </div>
                     </div>
@@ -1032,45 +2429,80 @@
             );
         };
 
+        // ═══════════════════════════════════════════════════════════════
+        // ✈️ LoadingPage — flight print/issuance screen
+        // ═══════════════════════════════════════════════════════════════
         const LoadingPage = ({ leadData = {} }) => {
-            const dollars = Array.from({ length: 16 });
-            const avatarLabel = { owner: 'בעל עסק בארץ', employee: 'שכיר ששואף לעצמאות', beginner: 'יזם בתחילת הדרך' }[leadData.avatar] || 'פרופיל יזמי';
-            const incomeLabel = leadData.incomeGoal === '$20k+' ? '20,000$+' : leadData.incomeGoal === '$10k-$20k' ? '10,000$-20,000$' : '5,000$-10,000$';
-            const characterLabel = leadData.thinkerType === 'טכני' ? 'חשיבה אנליטית ומדויקת' : leadData.thinkerType === 'אומן' ? 'נפש יצירתית ויזמית' : 'ראש עסקי חד';
-            const steps = [
-                'מזהה את הפרופיל שלך: ' + avatarLabel,
-                'מתאים לאופי שלך: ' + characterLabel,
-                'בונה מסלול להכנסה של ' + incomeLabel + ' בחודש',
+            const vals = flTicketValues(leadData, '', 99);
+            const profLabel = vals.prof || '';
+            const charShort = vals.char || '';
+            const charLong = FLIGHT_DATA.char_long[charShort] || charShort;
+            const goalShort = vals.goal || '';
+            const goalLong = FLIGHT_DATA.goal_long[goalShort];
+            const nameVal = (leadData.firstName || '').trim();
+
+            const checklistItems = [
+                'מזהה את הפרופיל שלך: ' + profLabel,
+                'מתאים לאופי שלך: ' + charLong,
+                goalLong ? 'בונה מסלול להכנסה של ' + goalLong + ' בחודש' : 'בונה מסלול לרכישת יכולת חדשה',
                 'מתאים הדרכה: הקמת סוכנות שיווק בארה״ב'
             ];
-            const [shown, setShown] = useState(0);
+
+            const [printTime, setPrintTime] = useState(0);
+            const clockRef = useRef(null);
             useEffect(() => {
-                const timers = steps.map((_, i) => setTimeout(() => setShown(i + 1), 400 + i * 800));
-                return () => timers.forEach(clearTimeout);
+                clockRef.current = setInterval(() => {
+                    setPrintTime(t => {
+                        const next = Math.min(4400, t + 100);
+                        if (next >= 4400) clearInterval(clockRef.current);
+                        return next;
+                    });
+                }, 100);
+                return () => { if (clockRef.current) clearInterval(clockRef.current); };
             }, []);
+
+            const issued = printTime >= 4400;
+            const title = issued
+                ? (nameVal ? nameVal + ', הכרטיס שלך מוכן' : 'הכרטיס שלך מוכן')
+                : 'רגע, מנפיקים לך את הכרטיס…';
+
             return (
-                <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 fade-enter fade-enter-active w-full text-center overflow-hidden">
-                    {dollars.map((_, i) => (
-                        <div key={i} className="dollar-bill" style={{ left: `${Math.random() * 100}vw`, animationDuration: `${Math.random() * 2 + 2}s`, animationDelay: `${Math.random() * 3}s`, fontSize: `${Math.random() * 1.5 + 1}rem`, opacity: Math.random() * 0.5 + 0.3 }}>$</div>
-                    ))}
-                    <div className="max-w-md w-full space-y-7 center-all z-10 relative">
-                        <div className="w-16 h-16 border-4 border-white/20 border-t-cta rounded-full animate-spin"></div>
-                        <h2 className="text-xl md:text-2xl font-bold text-white leading-relaxed pulse-text">רגע, מתאימים לך את ההדרכה המדויקת…</h2>
-                        <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
-                            {steps.map((s, i) => (
-                                <div key={i} className={`flex items-center gap-3 w-full transition-all duration-500 ${i < shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
-                                    <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold ${i < shown ? 'bg-[#4ade80] text-black' : 'bg-white/10 text-white/40'}`}>✓</span>
-                                    <span className="text-white text-base md:text-lg text-right flex-1">{s}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="pt-6 border-t border-white/10 flex flex-col items-center gap-3 w-full mt-2" style={{ textAlign: 'center' }}>
-                            <img src="public/alex hormozi.png" alt="Alex Hormozi" className="w-14 h-14 rounded-full border-2 border-[#fbbf24] shadow-lg object-cover mx-auto" />
-                            <p style={{ fontSize: '1.05rem', lineHeight: '1.6', color: '#5298fa', fontStyle: 'italic', fontWeight: 'bold', textAlign: 'center', width: '100%' }}>
-                                "אם אתה רוצה להרוויח הרבה כסף ואתה לא גר בארה״ב... תלמד אנגלית, תקנה מחשב ותתחיל למכור שירותים ללקוחות אמריקאים."
-                            </p>
-                            <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest w-full" style={{ textAlign: 'center' }}>- Alex Hormozi</span>
-                        </div>
+                <div className="fl-page">
+                    <div className="fl-col">
+                        <div className="fl-glow" aria-hidden="true"></div>
+                        <BoardingPass
+                            leadData={leadData}
+                            answeredCount={10}
+                            freshField={null}
+                            isPrint={true}
+                            printTime={printTime}
+                            inputValue=""
+                            currentStep={99}
+                        />
+                        <h1 className="fl-print-title" aria-live="polite">{title}</h1>
+                        <ul className="fl-checklist" aria-label="שלבי ההנפקה">
+                            {checklistItems.map((label, i) => {
+                                const doneAt = 400 + (i + 1) * 900;
+                                const startAt = 400 + i * 900;
+                                const isDone = printTime >= doneAt;
+                                const isActive = !isDone && printTime >= startAt;
+                                return (
+                                    <li key={i} className={'fl-check' + (isDone ? ' is-done' : '') + (isActive ? ' is-active' : '')}>
+                                        <span className="fl-check__icon">
+                                            <span className="fl-check__wait" aria-hidden="true"></span>
+                                            <span className="fl-check__spin" aria-hidden="true"></span>
+                                            <span className="fl-check__done">{FL_CHECK_SVG(14)}</span>
+                                        </span>
+                                        <span className="fl-check__label">{label}</span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <figure className="fl-quote">
+                            <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="#2E59F4"><path d="M10 7H6a3 3 0 0 0-3 3v4h5v-4H5.5A.5.5 0 0 1 6 9.5h4zm11 0h-4a3 3 0 0 0-3 3v4h5v-4h-2.5a.5.5 0 0 1 .5-.5h4z"/></svg>
+                            <blockquote>אם אתה רוצה להרוויח הרבה כסף ואתה לא גר בארה״ב... תלמד אנגלית, תקנה מחשב ותתחיל למכור שירותים ללקוחות אמריקאים.</blockquote>
+                            <figcaption><span className="fl-ltr">Alex Hormozi</span></figcaption>
+                        </figure>
                     </div>
                 </div>
             );
@@ -1439,13 +2871,18 @@
                 const r = getHashRoute();
                 return typeof r === 'object' ? r.step : 0;
             });
-            const [leadData, setLeadData] = useState({});
+            const [leadData, setLeadData] = useState(() => {
+                const av = HASH_TO_AVATAR[getHashRoute()];
+                if (av) return { firstName: 'שמואל', incomeGoal: '$20k+', workspacePreference: 'מכל מקום', avatar: av };
+                return {};
+            });
             const [avatarOverride, setAvatarOverride] = useState(() => HASH_TO_AVATAR[getHashRoute()] || '');
 
             const [inputValue, setInputValue] = useState('');
             const [lowTimePopup, setLowTimePopup] = useState(false);
             const [agePopup, setAgePopup] = useState(null);
             const [pickResetKey, setPickResetKey] = useState(0);
+            const [stageScreen, setStageScreen] = useState(null); // null | 0 (after Q3) | 1 (after Q6)
             // לכידת מזהה ליד + פרמטרי קמפיין (UTM/fbclid/gclid) — פעם אחת בטעינה, נשמר ב-leadData ונשלח בכל וובהוק
             useEffect(() => {
                 const p = new URLSearchParams(window.location.search);
@@ -1508,15 +2945,22 @@
                 return () => window.removeEventListener('hashchange', trackRoute);
             }, []);
 
+            const prevHashRef = useRef(window.location.hash);
+            const leadDataRef = useRef(leadData);
+            useEffect(() => { leadDataRef.current = leadData; }, [leadData]);
             useEffect(() => {
                 const onHashChange = () => {
                     const r = getHashRoute();
-                    
+                    const curHash = window.location.hash;
+                    const hashActuallyChanged = curHash !== prevHashRef.current;
+                    prevHashRef.current = curHash;
                     if (typeof r === 'object') {
                         setViewState('quiz');
                         setQuizStep(r.step);
-                        setInputValue(leadData[quizQuestions[r.step]?.id] || '');
+                        setInputValue(leadDataRef.current[quizQuestions[r.step]?.id] || '');
                         setErrorMsg('');
+                        // Only clear stage screen on actual hash navigation, not on effect re-runs
+                        if (hashActuallyChanged) setStageScreen(null);
                     } else if (typeof r === 'string' && r.indexOf('training') === 0) {
                         setViewState('training');
                         setAvatarOverride(HASH_TO_AVATAR[r] || ''); // איפוס אם הנתיב לא ממופה לאווטאר (מונע דליפת אווטאר בין נתיבים)
@@ -1530,7 +2974,7 @@
 
                 window.addEventListener('hashchange', onHashChange);
                 return () => window.removeEventListener('hashchange', onHashChange);
-            }, [leadData]);
+            }, []);
 
             const sendWebhook = (url, data) => {
                 fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }).catch(err => console.error(err));
@@ -1577,6 +3021,18 @@
             const proceed = (currentData) => {
                 if (quizStep < quizQuestions.length - 1) {
                     const nextStep = quizStep + 1;
+                    // Show stage screen after Q3 (step 2→3) or Q6 (step 5→6)
+                    if (quizStep === 2) {
+                        // End of check-in stage — show stage screen before advancing
+                        setStageScreen(0);
+                        // Don't advance yet; onStageComplete will do it
+                        return;
+                    }
+                    if (quizStep === 5) {
+                        // End of passport stage — show stage screen before advancing
+                        setStageScreen(1);
+                        return;
+                    }
                     setQuizStep(nextStep);
                     setInputValue(currentData[quizQuestions[nextStep].id] || '');
                     window.history.pushState(null, '', `#/quiz${nextStep + 1}`);
@@ -1596,14 +3052,27 @@
                 }
             };
 
+            // Stage screen dismissed — advance to the next question
+            const handleStageComplete = () => {
+                const nextStep = stageScreen === 0 ? 3 : 6;
+                setStageScreen(null);
+                setQuizStep(nextStep);
+                setInputValue(leadData[quizQuestions[nextStep].id] || '');
+                window.history.pushState(null, '', `#/quiz${nextStep + 1}`);
+                trackRoute();
+                sendFunnelEvent('quiz-step-' + (nextStep + 1), { lead_id: leadData.lead_id, phone: leadData.phone || '', email: leadData.email || '', firstName: leadData.firstName || '' });
+            };
+
             return (
-                <div className="min-h-screen flex flex-col justify-between w-full">
-                    <header className="w-full p-8 flex justify-center items-center z-10 relative">
-                        <img src="public/noBgWhite (1) (2).png" alt="Dollar Academy Logo" className="h-20 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => { navigateTo('landing'); setViewState('landing'); }} />
-                    </header>
-                    <main className={`flex-grow z-20 relative flex flex-col items-center w-full ${view === 'booking' ? 'justify-start' : 'justify-center'}`}>
+                <div className="min-h-screen flex flex-col justify-between w-full" style={(view === 'quiz' || view === 'loading') ? { background: '#0A0D18' } : undefined}>
+                    {view !== 'quiz' && view !== 'loading' && (
+                        <header className="w-full p-8 flex justify-center items-center z-10 relative">
+                            <img src="public/noBgWhite (1) (2).png" alt="Dollar Academy Logo" className="h-20 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => { navigateTo('landing'); setViewState('landing'); }} />
+                        </header>
+                    )}
+                    <main className={`flex-grow z-20 relative flex flex-col items-center w-full ${view === 'booking' ? 'justify-start' : (view === 'quiz' || view === 'loading') ? '' : 'justify-center'}`}>
                         {view === 'landing' && <LandingPage onStartQuiz={() => { navigateTo('quiz', 0); setViewState('quiz'); setQuizStep(0); setInputValue(''); sendFunnelEvent('quiz-step-1', { lead_id: leadData.lead_id }); }} />}
-                        {view === 'quiz' && <QuizPage step={quizStep} leadData={leadData} onChoice={(val) => { if (quizQuestions[quizStep].id === 'weeklyTime' && val === 'פחות משעה ביום') { setLeadData({...leadData, weeklyTime: 'פחות משעה ביום', lowTimeFirstPick: true}); setLowTimePopup(true); return; } const nd = {...leadData, [quizQuestions[quizStep].id]: val}; setLeadData(nd); proceed(nd); }} onNext={handleNext} onPrev={() => { const ps = quizStep - 1; setQuizStep(ps); setInputValue(leadData[quizQuestions[ps].id] || ''); window.history.pushState(null, '', `#/quiz${ps+1}`); trackRoute(); }} inputValue={inputValue} setInputValue={setInputValue} errorMsg={errorMsg} inputRef={inputRef} pickResetKey={pickResetKey} />}
+                        {view === 'quiz' && <QuizPage step={quizStep} leadData={leadData} onChoice={(val) => { if (quizQuestions[quizStep].id === 'weeklyTime' && val === 'פחות משעה ביום') { setLeadData({...leadData, weeklyTime: 'פחות משעה ביום', lowTimeFirstPick: true}); setLowTimePopup(true); return; } const nd = {...leadData, [quizQuestions[quizStep].id]: val}; setLeadData(nd); proceed(nd); }} onNext={handleNext} onPrev={() => { const ps = quizStep - 1; setStageScreen(null); setQuizStep(ps); setInputValue(leadData[quizQuestions[ps].id] || ''); window.history.pushState(null, '', `#/quiz${ps+1}`); trackRoute(); }} inputValue={inputValue} setInputValue={setInputValue} errorMsg={errorMsg} inputRef={inputRef} pickResetKey={pickResetKey} stageScreen={stageScreen} onStageComplete={handleStageComplete} />}
                         {view === 'loading' && <LoadingPage leadData={leadData} />}
                         {view === 'booking' && <BookingPage leadData={leadData} />}
                         {(view === 'training' || view === 'confirm' || view === 'loading-2' || view === 'advanced-training') && <TrainingPage leadData={leadData} setLeadData={setLeadData} avatarOverride={avatarOverride} />}
@@ -1645,15 +3114,17 @@
                             </div>
                         </div>
                     )}
-                    <footer className="w-full flex flex-col items-center text-center p-8 text-white/50 text-xs tracking-wide z-10 relative mt-auto border-t border-white/5">
-                        <img src="public/noBgWhite (1) (2).png" alt="Logo" className="h-10 md:h-12 object-contain mb-4 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500" />
-                        <div className="mb-2 w-full text-center">© 2026 Dollar Academy. כל הזכויות שמורות.</div>
-                        <div className="flex justify-center items-center gap-2 w-full">
-                            <a href="https://dollaracademy.co.il/%d7%9e%d7%93%d7%99%d7%a0%d7%99%d7%95%d7%aa-%d7%a4%d7%a8%d7%98%d7%99%d7%95%d7%aa/" target="_blank" className="hover:text-white/80 hover:underline transition-colors">מדיניות פרטיות</a>
-                            <span>|</span>
-                            <a href="https://dollaracademy.co.il/%d7%94%d7%a6%d7%94%d7%a8%d7%aa-%d7%a0%d7%92%d7%99%d7%a9%d7%95%d7%aa/" target="_blank" className="hover:text-white/80 hover:underline transition-colors">הצהרת נגישות</a>
-                        </div>
-                    </footer>
+                    {view !== 'quiz' && view !== 'loading' && (
+                        <footer className="w-full flex flex-col items-center text-center p-8 text-white/50 text-xs tracking-wide z-10 relative mt-auto border-t border-white/5">
+                            <img src="public/noBgWhite (1) (2).png" alt="Logo" className="h-10 md:h-12 object-contain mb-4 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500" />
+                            <div className="mb-2 w-full text-center">© 2026 Dollar Academy. כל הזכויות שמורות.</div>
+                            <div className="flex justify-center items-center gap-2 w-full">
+                                <a href="https://dollaracademy.co.il/%d7%9e%d7%93%d7%99%d7%a0%d7%99%d7%95%d7%aa-%d7%a4%d7%a8%d7%98%d7%99%d7%95%d7%aa/" target="_blank" className="hover:text-white/80 hover:underline transition-colors">מדיניות פרטיות</a>
+                                <span>|</span>
+                                <a href="https://dollaracademy.co.il/%d7%94%d7%a6%d7%94%d7%a8%d7%aa-%d7%a0%d7%92%d7%99%d7%a9%d7%95%d7%aa/" target="_blank" className="hover:text-white/80 hover:underline transition-colors">הצהרת נגישות</a>
+                            </div>
+                        </footer>
+                    )}
                 </div>
             );
         }
