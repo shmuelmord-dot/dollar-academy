@@ -232,6 +232,31 @@
         .quote-fade { animation: quoteFade 0.45s ease-out; }
         @keyframes quoteBar { from { width: 0; } to { width: 100%; } }
 
+        /* ── wa3 · WhatsApp proof section ── */
+        .wa3-shot{mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 82%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 82%,transparent 100%);transition:transform .25s ease}
+        .wa3-band{mask-image:linear-gradient(to right,transparent 0,#000 160px,#000 100%);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 160px,#000 100%)}
+        .wa3-track{animation:wa3-marq 80s linear infinite}
+        @keyframes wa3-marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        .wa3-band:hover .wa3-track,.wa3-band:focus-within .wa3-track,.wa3-band.wa3-paused .wa3-track{animation-play-state:paused!important}
+        .wa3-fig{text-shadow:0 0 22px rgba(74,222,128,.28);transition:text-shadow .2s ease}
+        .wa3-msg:hover .wa3-fig{text-shadow:0 0 30px rgba(74,222,128,.6)}
+        .wa3-msg:hover .wa3-shot{transform:translateY(-6px)}
+        @keyframes wa3-ring{0%{box-shadow:0 0 0 0 rgba(46,89,244,.6)}100%{box-shadow:0 0 0 22px rgba(46,89,244,0)}}
+        .wa3-pulse{animation:wa3-ring 1.8s ease-out infinite}
+        .wa3-lbin{animation:wa3-lbin .25s ease both}
+        @keyframes wa3-lbin{from{opacity:0}to{opacity:1}}
+        .wa3-progress{transition:none}
+        @media(max-width:767px){
+            .wa3-band{mask-image:linear-gradient(to right,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%)}
+            .wa3-track{animation-duration:60s}
+        }
+        @media(prefers-reduced-motion:reduce){
+            .wa3-track{animation:none!important}
+            .wa3-band{overflow-x:auto!important}
+            .wa3-pulse,.wa3-lbin{animation:none!important}
+            .wa3-shot,.wa3-fig{transition:none}
+        }
+
         /* ==========================================================================
            השאלון כטיסה · Flight boarding-pass visual layer
            All classes prefixed fl- to avoid conflicts with existing styles.
@@ -1085,6 +1110,249 @@
             </div>
         );
 
+        /* ── wa3 data + component ── */
+        const WA3_MESSAGES = [
+          { id:'yuval', name:'יובל', role:'לקוח ליווי', figure:'$15,300', context:'בחודש. כמעט $11,000 רווח', img:'public/wa3/whatsapp/01-yuval.jpg', w:600, h:296 },
+          { id:'amir', name:'אמיר', role:'לקוח ליווי', figure:'$13,000', context:'ינואר נסגר, כמעט 10 אלף רווח', img:'public/wa3/whatsapp/02-amir.jpg', w:600, h:543 },
+          { id:'chen', name:'חן', role:'לקוח ליווי', figure:'$10,500', context:'חודש חמישי בתכנית', img:'public/wa3/whatsapp/03-chen.jpg', w:600, h:410 },
+          { id:'roni', name:'רוני', role:'לקוחה ליווי', figure:'$9,900', context:'החודש, עם 7 לקוחות פעילים', img:'public/wa3/whatsapp/04-roni.jpg', w:600, h:369 },
+          { id:'ram', name:'רם', role:'לקוח ליווי', figure:'$4,000', context:'3 עסקאות ביום אחד', img:'public/wa3/whatsapp/05-ram.jpg', w:600, h:557 },
+          { id:'amit', name:'עמית', role:'לקוח ליווי', figure:'$1,200', context:'הלקוח הראשון. מהחודש הבא $1,500', img:'public/wa3/whatsapp/06-amit.jpg', w:600, h:429 },
+          { id:'dina', name:'דינה', role:'לקוחה ליווי', figure:'לקוח שלישי', context:'בשלושה ימים', img:'public/wa3/whatsapp/07-dina.jpg', w:600, h:543 },
+        ];
+
+        const Wa3Section = () => {
+          const [mob, setMob] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+          const [lightbox, setLightbox] = useState(null);
+          const [vidPlaying, setVidPlaying] = useState(false);
+          const [vidTime, setVidTime] = useState(0);
+          const [vidDur, setVidDur] = useState(24);
+          const vidRef = useRef(null);
+          const rafRef = useRef(null);
+
+          useEffect(() => {
+            const h = () => setMob(window.innerWidth < 768);
+            window.addEventListener('resize', h);
+            return () => window.removeEventListener('resize', h);
+          }, []);
+
+          /* video time tracking */
+          const trackTime = React.useCallback(() => {
+            if (vidRef.current) {
+              setVidTime(vidRef.current.currentTime);
+              if (vidRef.current.duration) setVidDur(vidRef.current.duration);
+            }
+            rafRef.current = requestAnimationFrame(trackTime);
+          }, []);
+
+          const togglePlay = React.useCallback(() => {
+            const v = vidRef.current;
+            if (!v) return;
+            if (v.paused || v.ended) {
+              v.play().catch(() => {});
+            } else {
+              v.pause();
+            }
+          }, []);
+
+          useEffect(() => {
+            const v = vidRef.current;
+            if (!v) return;
+            const onPlay = () => { setVidPlaying(true); rafRef.current = requestAnimationFrame(trackTime); };
+            const onPause = () => { setVidPlaying(false); if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+            const onEnded = () => { setVidPlaying(false); setVidTime(0); if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+            v.addEventListener('play', onPlay);
+            v.addEventListener('pause', onPause);
+            v.addEventListener('ended', onEnded);
+            return () => { v.removeEventListener('play', onPlay); v.removeEventListener('pause', onPause); v.removeEventListener('ended', onEnded); if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+          }, [trackTime]);
+
+          /* body scroll lock */
+          useEffect(() => {
+            if (lightbox !== null) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = '';
+            return () => { document.body.style.overflow = ''; };
+          }, [lightbox]);
+
+          /* escape key */
+          useEffect(() => {
+            if (lightbox === null) return;
+            const h = (e) => { if (e.key === 'Escape') setLightbox(null); };
+            window.addEventListener('keydown', h);
+            return () => window.removeEventListener('keydown', h);
+          }, [lightbox]);
+
+          const openMsg = (i) => setLightbox(i);
+          const closeMsg = () => setLightbox(null);
+          const prevMsg = () => setLightbox((lightbox - 1 + WA3_MESSAGES.length) % WA3_MESSAGES.length);
+          const nextMsg = () => setLightbox((lightbox + 1) % WA3_MESSAGES.length);
+
+          /* phone dimensions */
+          const phoneW = mob ? 236 : 300;
+          const phoneH = mob ? 502 : 641;
+          const phonePad = mob ? 8 : 9;
+          const phoneBR = mob ? 40 : 48;
+          const screenBR = mob ? 33 : 40;
+          const playSize = mob ? 64 : 76;
+
+          /* message card */
+          const MsgCard = ({ msg, i }) => (
+            <button type="button" className="wa3-msg" onClick={() => openMsg(i)}
+              style={{ flex:'none', width: mob ? 200 : 280, display:'flex', flexDirection:'column', gap: mob ? 6 : 8, background:'none', border:'none', padding:0, cursor:'pointer', fontFamily:'inherit', textAlign:'start', color:'inherit', marginTop: i % 2 === 1 ? (mob ? 26 : 40) : 0 }}>
+              <span className="wa3-fig" style={{ fontFamily:'Rubik,sans-serif', fontWeight:800, fontSize: mob ? 32 : 44, lineHeight:1.1, color:'#4ADE80', direction:'ltr', unicodeBidi:'isolate' }}>{msg.figure}</span>
+              <span style={{ fontSize: mob ? 13.5 : 15, fontWeight:700, lineHeight:1.4, color:'#DCE3F5' }}>{msg.context}</span>
+              <span style={{ fontSize: mob ? 11.5 : 12.5, fontWeight:600, color:'#8A97BE' }}>{msg.name} · {msg.role}</span>
+              <img className="wa3-shot" src={msg.img} alt={'צילום מסך — ' + msg.name} loading="lazy"
+                style={{ width:'100%', height:'auto', display:'block' }} />
+            </button>
+          );
+
+          /* build doubled track */
+          const msgCards = WA3_MESSAGES.map((m, i) => <MsgCard key={'a'+i} msg={m} i={i} />);
+          const msgCards2 = WA3_MESSAGES.map((m, i) => <MsgCard key={'b'+i} msg={m} i={i} />);
+
+          /* progress pct */
+          const pct = vidDur > 0 ? ((vidTime / vidDur) * 100) : 0;
+
+          /* speaker icon */
+          const speakerSvg = <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>;
+
+          return (
+            <>
+            <section className="flex flex-col items-center gap-4" style={{ width:'100vw', marginInlineStart:'calc(50% - 50vw)', padding: mob ? '2.5rem 0' : '2.5rem 0' }}>
+              {/* title */}
+              <div style={{ width:'100%', maxWidth:1240, padding: mob ? '0 20px' : '0 40px', display:'flex', flexDirection:'column', gap:12, alignItems:'center' }}>
+                <span style={{ fontFamily:'Rubik,sans-serif', fontWeight:700, fontSize: mob ? 14 : 15, letterSpacing:'.04em', color:'#4282FA' }}>03 · ישר מהוואטסאפ</span>
+                <h2 style={{ margin:0, fontFamily:'Rubik,sans-serif', fontWeight:800, fontSize: mob ? 24 : 36, lineHeight:1.18, textAlign:'center', textWrap:'balance' }}>ההודעות וההקלטות שתלמידי הליווי שולחים לנו</h2>
+              </div>
+
+              {/* stage */}
+              <div style={{ position:'relative', width:'100%', height: mob ? 820 : 660, overflow:'hidden' }}>
+                {/* phone */}
+                <div style={{ position:'absolute', zIndex:3, ...(mob ? { left:'50%', transform:'translateX(-50%)', top:0 } : { right:'calc(50% - 580px)', top:0 }) }}>
+                  {/* blue halo */}
+                  <div aria-hidden="true" style={{ position:'absolute', top:10, left:'50%', transform:'translateX(-50%)', width:420, height:620, background:'radial-gradient(closest-side,rgba(46,89,244,.26),transparent)', pointerEvents:'none', zIndex:-1 }} />
+                  {/* phone frame */}
+                  <div style={{ width:phoneW, height:phoneH, padding:phonePad, borderRadius:phoneBR, background:'#0A0D18', border:'1px solid #2A3556', boxShadow:'0 0 0 6px rgba(10,13,24,.9), 0 40px 120px rgba(46,89,244,.3)', position:'relative', overflow:'hidden' }}>
+                    {/* screen */}
+                    <div style={{ width:'100%', height:'100%', borderRadius:screenBR, overflow:'hidden', position:'relative', background:'#000', cursor:'pointer' }} onClick={togglePlay}>
+                      <video ref={vidRef} playsInline preload="metadata" poster="public/wa3/gal-avraham-recording-poster.jpg" src="public/wa3/gal-avraham-recording.mp4#t=0.5"
+                        style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+
+                      {/* idle overlay */}
+                      {!vidPlaying && (
+                        <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'space-between', padding: mob ? 14 : 18,
+                          background:'linear-gradient(to top, rgba(0,0,0,.94) 0%, rgba(0,0,0,.6) 30%, rgba(0,0,0,.38) 55%, rgba(0,0,0,.5) 100%)' }}>
+                          {/* top chip */}
+                          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                            <img src="public/wa3/gal-avraham-face.jpg" alt="" style={{ width:34, height:34, borderRadius:'50%', border:'2px solid #2E59F4', objectFit:'cover' }} />
+                            <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
+                              <span style={{ fontFamily:'Rubik,sans-serif', fontSize:15, fontWeight:800, color:'#F4F6FC' }}>גל אברהם</span>
+                              <span style={{ fontSize:12, fontWeight:700, color:'#9DB8FF' }}>לקוח ליווי · הקלטה מהוואטסאפ</span>
+                            </div>
+                          </div>
+                          {/* center play */}
+                          <div style={{ display:'flex', justifyContent:'center', alignItems:'center' }}>
+                            <div className="wa3-pulse" style={{ width:playSize, height:playSize, borderRadius:'50%', background:'#2E59F4', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" style={{ marginLeft:3 }}><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+                            </div>
+                          </div>
+                          {/* bottom */}
+                          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                              {speakerSvg}
+                              <span style={{ fontSize:14, fontWeight:700, color:'#DCE3F5' }}>תפעילו סאונד</span>
+                            </div>
+                            <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:12, color:'#8A97BE', direction:'ltr' }}>0:24</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* playing progress bar */}
+                      {vidPlaying && (
+                        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:4, background:'rgba(255,255,255,.15)', direction:'ltr' }}>
+                          <div className="wa3-progress" style={{ height:'100%', background:'#4ADE80', width: pct + '%' }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* message marquee strip */}
+                <div className={'wa3-band' + (lightbox !== null ? ' wa3-paused' : '')} dir="ltr"
+                  style={{ position:'absolute', overflow:'hidden',
+                    ...(mob
+                      ? { top:490, left:0, right:0, height:330 }
+                      : { top:150, left:0, right:'calc(50% - 430px)', height:440 })
+                  }}>
+                  <div className="wa3-track" style={{ display:'flex', gap: mob ? 22 : 44, width:'max-content', paddingTop:8, paddingBottom:8 }}>
+                    {msgCards}
+                    {msgCards2}
+                  </div>
+                </div>
+              </div>
+
+              {/* disclaimer */}
+              <p style={{ margin:0, fontSize:12, color:'#8A97BE', textAlign:'center', padding:'0 20px', maxWidth:680 }}>
+                {mob ? 'גע בהודעה כדי לקרוא אותה בגדול. ' : 'לחץ על הודעה כדי לקרוא אותה בגדול. '}
+                הקלטות וצילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.
+              </p>
+            </section>
+
+            {/* lightbox modal */}
+            {lightbox !== null && ReactDOM.createPortal(
+              <div role="dialog" aria-modal="true" className="wa3-lbin"
+                onClick={(e) => { if (e.target === e.currentTarget) closeMsg(); }}
+                style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(6,8,16,.9)', display:'flex', alignItems:'center', justifyContent:'center', padding: mob ? 20 : 40 }}>
+                <div style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', gap: mob ? 14 : 20, maxWidth: mob ? '100%' : 520, width:'100%' }}>
+                  {/* close btn */}
+                  <button type="button" onClick={closeMsg} aria-label="סגירה"
+                    style={{ position:'absolute', top: mob ? -50 : -24, right: mob ? 0 : -56, width:44, height:44, borderRadius:'50%', border:'1px solid #2A3556', background:'rgba(10,13,24,.8)', color:'#C9D2EC', fontSize:20, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1 }}>
+                    ✕
+                  </button>
+                  {/* figure */}
+                  <span style={{ fontFamily:'Rubik,sans-serif', fontWeight:800, fontSize: mob ? 40 : 52, lineHeight:1.1, color:'#4ADE80', direction:'ltr', unicodeBidi:'isolate', textShadow:'0 0 30px rgba(74,222,128,.35)' }}>{WA3_MESSAGES[lightbox].figure}</span>
+                  {/* context */}
+                  <span style={{ fontSize: mob ? 15 : 17, fontWeight:700, color:'#DCE3F5', textAlign:'center' }}>{WA3_MESSAGES[lightbox].context}</span>
+                  {/* name */}
+                  <span style={{ fontSize: mob ? 13 : 14, fontWeight:600, color:'#8A97BE' }}>{WA3_MESSAGES[lightbox].name} · {WA3_MESSAGES[lightbox].role}</span>
+                  {/* screenshot */}
+                  <img src={WA3_MESSAGES[lightbox].img} alt={'צילום מסך — ' + WA3_MESSAGES[lightbox].name}
+                    style={{ width:'100%', maxWidth:420, borderRadius:14, boxShadow:'0 20px 60px rgba(0,0,0,.5)' }} />
+                  {/* navigation */}
+                  {mob ? (
+                    <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+                      <button type="button" onClick={prevMsg} aria-label="הקודם"
+                        style={{ width:48, height:48, borderRadius:'50%', border:'1px solid #2A3556', background:'rgba(20,26,46,.9)', color:'#C9D2EC', fontSize:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                      </button>
+                      <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:13, color:'#8A97BE', direction:'ltr', unicodeBidi:'isolate' }}>{lightbox + 1} / {WA3_MESSAGES.length}</span>
+                      <button type="button" onClick={nextMsg} aria-label="הבא"
+                        style={{ width:48, height:48, borderRadius:'50%', border:'1px solid #2A3556', background:'rgba(20,26,46,.9)', color:'#C9D2EC', fontSize:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button type="button" onClick={prevMsg} aria-label="הקודם"
+                        style={{ position:'absolute', top:'50%', right:-72, transform:'translateY(-50%)', width:52, height:52, borderRadius:'50%', border:'1px solid #2A3556', background:'rgba(20,26,46,.9)', color:'#C9D2EC', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                      </button>
+                      <button type="button" onClick={nextMsg} aria-label="הבא"
+                        style={{ position:'absolute', top:'50%', left:-72, transform:'translateY(-50%)', width:52, height:52, borderRadius:'50%', border:'1px solid #2A3556', background:'rgba(20,26,46,.9)', color:'#C9D2EC', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                      </button>
+                      <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:13, color:'#8A97BE', direction:'ltr', unicodeBidi:'isolate' }}>{lightbox + 1} / {WA3_MESSAGES.length}</span>
+                    </>
+                  )}
+                </div>
+              </div>,
+              document.body
+            )}
+            </>
+          );
+        };
+
         function resolveAvatar(key) {
             return AVATARS[key] ? key : 'beginner';
         }
@@ -1211,7 +1479,8 @@
             const [storiesOpen, setStoriesOpen] = useState(false);
             const [storyPlaying, setStoryPlaying] = useState(null);
             const [whyOpen, setWhyOpen] = useState(0);
-            
+            const [videoFs, setVideoFs] = useState(false);
+
             // CRITICAL FIX: Forced Facebook Pixel AddToCart Event
             // This fires on mount for all training variations regardless of state
             useEffect(() => {
@@ -1399,7 +1668,6 @@
             const ticketData = TRAINING_TICKET.avatars[avatarKey] || TRAINING_TICKET.avatars.beginner;
             const stopLabels = TRAINING_TICKET.stopLabels;
 
-            const [videoFs, setVideoFs] = useState(false);
             const requestFullscreen = () => setVideoFs(true);
             const exitFullscreen = () => setVideoFs(false);
 
@@ -1997,23 +2265,8 @@
                         <QuoteRotator quoteKeys={PROOF.quoteRotationLanding} />
                     </section>
 
-                    {/* ── 03 · ישר מהוואטסאפ — auto-scroll carousel ── */}
-                    <section className="flex flex-col items-center gap-4" style={{width:'100vw',marginInlineStart:'calc(50% - 50vw)',padding:'2.5rem 0'}}>
-                        <SectionLabel num="03" text="ישר מהוואטסאפ" />
-                        <h2 className="text-2xl font-extrabold text-white m-0 leading-tight text-center px-5" style={{textWrap:'balance'}}>ההודעות וההקלטות שתלמידי הליווי שולחים לנו</h2>
-                        <div className="w-full overflow-hidden" style={{direction:'ltr'}}>
-                            <div className="marquee-track" style={{animationDuration:'40s',gap:'16px',paddingTop:'8px',paddingBottom:'8px'}}>
-                                {[...Array(2)].map((_, r) => (
-                                    <React.Fragment key={r}>
-                                        {waMessages.map((msg, i) => (
-                                            <WhatsAppCard key={`wa-${r}-${i}`} msg={msg} />
-                                        ))}
-                                    </React.Fragment>
-                                ))}
-                            </div>
-                        </div>
-                        <p className="text-[#8A97BE] text-xs text-center px-5">צילומי מסך מהוואטסאפ של תלמידי הליווי. התוצאות משתנות מאדם לאדם.</p>
-                    </section>
+                    {/* ── 03 · ישר מהוואטסאפ — rich interactive section ── */}
+                    <Wa3Section />
 
                     {/* ── Final CTA + TrustLine ── */}
                     <div className="proof-section flex flex-col items-center gap-5 pb-12">
@@ -2162,7 +2415,7 @@
                     <div className="fl-ticket__top">
                         <div className="fl-ticket__head">
                             <span className="fl-ticket__label">כרטיס עלייה</span>
-                            <img className="fl-ticket__logo" src="quiz-flight-upgrade/assets/logo-dollar-academy.png" alt="Dollar Academy" />
+                            <img className="fl-ticket__logo" src="public/logo-dollar-academy.png" alt="Dollar Academy" />
                         </div>
                         <div className="fl-route">
                             <span className="fl-route__code fl-route__code--from fl-mono">TLV</span>
