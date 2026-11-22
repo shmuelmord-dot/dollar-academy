@@ -639,10 +639,13 @@
             'quiz-step-6': 'שאלון — שלב 6',
             'quiz-step-7': 'שאלון — שלב 7',
             'quiz-step-8': 'שאלון — שלב 8',
+            'quiz-step-9': 'שאלון — שלב 9',
+            'quiz-step-10': 'שאלון — שלב 10',
             'quiz_email_captured': 'השאיר מייל',
             'quiz_complete': 'סיים שאלון',
             'training-view': 'צפה בהדרכה',
-            'advanced-view': 'הגיע לטופס גשר',
+            'bridge-open': 'פתח את טופס "דברו איתי"',
+            'advanced-view': 'צפה בהדרכה המתקדמת',
             'hot_bridge_submit': 'שלח טופס (ליד חם)',
             'booking-view': 'הגיע לדף בוקינג'
         };
@@ -650,7 +653,161 @@
         function _trackStage(stage) {
             if (stage && !_journey.stages.includes(stage)) _journey.stages.push(stage);
             if (stage) _journey.last = stage;
+            jrMark(stage);
         }
+
+        // ⏱️ מסע הליד המפורט — בשביל מתאם הפגישות: מתי נכנס לכל שלב, כמה זמן היה בכל דף (רק כשהדף מול העיניים),
+        // וכמה צפה בפועל בכל הדרכה (דרך ה-API של יוטיוב). נכנס לכל וובהוק לזאפייר (שדות journey_* + profile_summary),
+        // ונשלח גם כעדכון נפרד כשהליד מגיע לדף קביעת שיחה וכשהוא יוצא מהאתר.
+        const JR_ORDER = ['quiz-step-1','quiz-step-2','quiz-step-3','quiz-step-4','quiz-step-5','quiz-step-6','quiz-step-7','quiz-step-8','quiz-step-9','quiz-step-10','quiz_email_captured','quiz_complete','training-view','bridge-open','hot_bridge_submit','advanced-view','booking-view'];
+        const JR_SEG = { 'training-view': 'training1', 'bridge-open': 'bridge', 'hot_bridge_submit': null, 'advanced-view': 'training2', 'booking-view': 'booking' };
+        const JR = { t: {}, vis: {}, seg: null, segStart: 0, video: {}, lead: {}, sent: { count: 0, keys: {} } };
+
+        function jrMark(stage) {
+            if (!stage || JR_ORDER.indexOf(stage) < 0) return;
+            if (!JR.t[stage]) JR.t[stage] = Date.now();
+            if (stage in JR_SEG) jrSegment(JR_SEG[stage]);
+        }
+        function jrFlush() {
+            if (JR.seg && JR.segStart) JR.vis[JR.seg] = (JR.vis[JR.seg] || 0) + (Date.now() - JR.segStart);
+            JR.segStart = (JR.seg && document.visibilityState === 'visible') ? Date.now() : 0;
+        }
+        function jrSegment(name) {
+            if (JR.seg === name) return;
+            jrFlush();
+            Object.keys(JR.video).forEach(k => { if (k !== name) jrVideoStop(k); }); // יצא מהדרכה = הספירה של הסרטון שלה נעצרת
+            JR.seg = name;
+            JR.segStart = (name && document.visibilityState === 'visible') ? Date.now() : 0;
+        }
+        function jrFurthest() {
+            let best = -1;
+            Object.keys(JR.t).concat(_journey.stages).forEach(s => { const i = JR_ORDER.indexOf(s); if (i > best) best = i; });
+            return best >= 0 ? JR_ORDER[best] : '';
+        }
+
+        function jrVideo(key) { return JR.video[key] || (JR.video[key] = { ms: 0, playing: 0, since: 0, maxPos: 0, dur: 0 }); }
+        function jrVideoStop(key) {
+            const v = JR.video[key];
+            if (v && v.playing > 0) { if (v.since) v.ms += Date.now() - v.since; v.playing = 0; v.since = 0; }
+        }
+        function jrVideoPlaying(key, on) {
+            const v = jrVideo(key), before = v.playing;
+            v.playing = Math.max(0, before + (on ? 1 : -1));
+            if (before === 0 && v.playing > 0) v.since = Date.now();
+            if (before > 0 && v.playing === 0) { if (v.since) v.ms += Date.now() - v.since; v.since = 0; }
+        }
+        let _jrYT = null;
+        function jrLoadYT() {
+            if (_jrYT) return _jrYT;
+            _jrYT = new Promise(res => {
+                if (window.YT && window.YT.Player) return res();
+                const prev = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => { try { if (prev) prev(); } catch (e) {} res(); };
+                const s = document.createElement('script');
+                s.src = 'https://www.youtube.com/iframe_api';
+                s.async = true;
+                document.head.appendChild(s);
+            });
+            return _jrYT;
+        }
+        // מחבר מעקב צפייה לאייפרם של יוטיוב (הכתובת חייבת לכלול enablejsapi=1)
+        function jrTrackVideo(iframe, key) {
+            if (!iframe || iframe.__jrKey) return;
+            iframe.__jrKey = key;
+            jrVideo(key);
+            jrLoadYT().then(() => {
+                if (!iframe.isConnected) return;
+                let isPlaying = false, poll = null, player = null;
+                const read = () => {
+                    try {
+                        const v = jrVideo(key);
+                        const p = Math.round(player.getCurrentTime() || 0), d = Math.round(player.getDuration() || 0);
+                        if (p > v.maxPos) v.maxPos = p;
+                        if (d) v.dur = d;
+                    } catch (e) {}
+                };
+                const set = on => {
+                    if (on === isPlaying) return;
+                    isPlaying = on;
+                    jrVideoPlaying(key, on);
+                    clearInterval(poll);
+                    if (on) poll = setInterval(() => {
+                        if (!iframe.isConnected) { clearInterval(poll); if (isPlaying) { isPlaying = false; jrVideoPlaying(key, false); } return; }
+                        read();
+                    }, 3000);
+                };
+                try {
+                    player = new YT.Player(iframe, { events: { onReady: read, onStateChange: e => { read(); set(e.data === 1); } } });
+                } catch (e) {}
+            }).catch(() => {});
+        }
+
+        function jrFmt(sec) { sec = Math.max(0, Math.round(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+        function jrClock(ts) { try { return new Date(ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' }); } catch (e) { return ''; } }
+
+        // תמונת מצב של המסע: שדות מספריים לזאפייר + טקסט קריא בעברית למתאם הפגישות
+        function jrSnapshot(lead) {
+            jrFlush();
+            const now = Date.now(), t = JR.t;
+            const firstQuiz = JR_ORDER.slice(0, 10).map(s => t[s]).filter(Boolean).sort((a, b) => a - b)[0];
+            const vid = k => {
+                const v = JR.video[k];
+                if (!v) return null;
+                return { watch: Math.round((v.ms + (v.playing > 0 && v.since ? now - v.since : 0)) / 1000), maxPos: v.maxPos, dur: v.dur };
+            };
+            const page = k => Math.round((JR.vis[k] || 0) / 1000);
+            const v1 = vid('training1'), v2 = vid('training2');
+            const last = jrFurthest();
+            const f = {
+                journey_last_stage: last,
+                journey_last_stage_he: STAGE_LABEL_HE[last] || last,
+                reached_booking: t['booking-view'] ? 'כן' : 'לא',
+                quiz_duration_sec: firstQuiz && t.quiz_complete ? Math.round((t.quiz_complete - firstQuiz) / 1000) : '',
+                training1_page_sec: page('training1'),
+                training1_watch_sec: v1 ? v1.watch : 0,
+                training1_furthest_sec: v1 ? v1.maxPos : 0,
+                training1_video_sec: v1 ? v1.dur : 0,
+                training2_page_sec: page('training2'),
+                training2_watch_sec: v2 ? v2.watch : 0,
+                training2_furthest_sec: v2 ? v2.maxPos : 0,
+                training2_video_sec: v2 ? v2.dur : 0,
+                booking_page_sec: page('booking'),
+                journey_updated_at: new Date(now).toISOString()
+            };
+            const vidLine = (v, pg) => {
+                if (!v || (!v.watch && !v.maxPos)) return 'לא הפעיל את הסרטון. היה בדף ' + jrFmt(pg) + ' דק׳';
+                return 'צפה ' + jrFmt(v.watch) + ' דק׳ בסרטון' + (v.dur ? ' (הגיע עד ' + jrFmt(v.maxPos) + ' מתוך ' + jrFmt(v.dur) + ')' : '') + '. היה בדף ' + jrFmt(pg) + ' דק׳';
+            };
+            const L = ['מסע הליד (עודכן ' + jrClock(now) + ')', 'שלב אחרון: ' + f.journey_last_stage_he];
+            if (firstQuiz) L.push('• שאלון: ' + (t.quiz_complete ? 'סיים תוך ' + jrFmt(f.quiz_duration_sec) + ' דק׳ (' + jrClock(firstQuiz) + '–' + jrClock(t.quiz_complete) + ')' : 'התחיל ב-' + jrClock(firstQuiz) + ' ולא סיים'));
+            if (t['training-view']) L.push('• הדרכה ראשונה: ' + vidLine(v1, f.training1_page_sec));
+            if (t['bridge-open'] && !t.hot_bridge_submit) L.push('• פתח את הטופס "דברו איתי" ולא שלח');
+            if (t.hot_bridge_submit) L.push('• ביקש שיחה בטופס ב-' + jrClock(t.hot_bridge_submit) + (lead && lead.whatsMissing ? '. מה חסר לו: ' + lead.whatsMissing : ''));
+            if (t['advanced-view']) L.push('• הדרכה מתקדמת: ' + vidLine(v2, f.training2_page_sec));
+            if (t['booking-view']) L.push('• דף קביעת שיחה: הגיע ב-' + jrClock(t['booking-view']) + ', היה שם ' + jrFmt(f.booking_page_sec) + ' דק׳ (אם קבע בפועל — רואים ביומן)');
+            if (firstQuiz && t['booking-view']) L.push('• מתחילת השאלון ועד דף קביעת השיחה: ' + jrFmt((t['booking-view'] - firstQuiz) / 1000) + ' דק׳');
+            f.journey_report_he = L.join('\n');
+            return f;
+        }
+
+        // עדכון מסע לזאפייר (רק לליד שכבר השאיר טלפון). לא יותר מפעם ב-2 דק׳ לאותו שלב+סיבה, ועד 8 עדכונים לליד.
+        function jrSendUpdate(reason) {
+            const lead = JR.lead || {};
+            if (!lead.phone || !WEBHOOKS.journey) return;
+            const key = reason + '|' + jrFurthest(), now = Date.now();
+            if (JR.sent.keys[key] && now - JR.sent.keys[key] < 120000) return;
+            if (JR.sent.count >= 8) return;
+            JR.sent.keys[key] = now;
+            JR.sent.count++;
+            const body = JSON.stringify(formatLeadForZapier(lead, { event_type: 'journey_update', update_reason: reason }));
+            try { fetch(WEBHOOKS.journey, { method: 'POST', mode: 'no-cors', keepalive: true, body }).catch(() => {}); }
+            catch (e) { try { navigator.sendBeacon(WEBHOOKS.journey, body); } catch (_) {} }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') { jrFlush(); jrSendUpdate('left_page'); }
+            else if (JR.seg) JR.segStart = Date.now();
+        });
+        window.addEventListener('pagehide', () => { jrFlush(); jrSendUpdate('left_page'); });
 
         const sendFunnelEvent = (eventType, data = {}) => {
             _trackStage(eventType);
@@ -664,7 +821,9 @@
                 owner:    'https://hooks.zapier.com/hooks/catch/16015214/4h6suys/', // ליד חם - עצמאי (כבר יש עסק בארץ)
                 employee: 'https://hooks.zapier.com/hooks/catch/16015214/4h6s34g/', // ליד חם - שכיר
                 beginner: 'https://hooks.zapier.com/hooks/catch/16015214/4h6sbvh/'  // ליד חם - ללא ניסיון
-            }
+            },
+            // עדכון מסע הליד (הגיע לדף קביעת שיחה / יצא מהאתר) — Catch Hook נפרד בזאפייר. ריק = לא נשלח.
+            journey: ''
         };
 
         // מיפוי נתיב-ישיר (לטירגוט קמפיינים) → אווטאר. למשל #/training-owner
@@ -700,14 +859,15 @@
 
         function formatLeadForZapier(leadData, extra = {}) {
             const { avatarKey: forcedAvatar, ...restExtra } = extra;
-            if (restExtra.event_type) _trackStage(restExtra.event_type);
+            if (restExtra.event_type && restExtra.event_type !== 'journey_update') _trackStage(restExtra.event_type);
             const avatarKey = forcedAvatar || leadData.avatar || '';
             const avatarHe  = AVATAR_LABEL_HE[avatarKey] || avatarKey || '';
             const incomeGoal = INCOME_GOAL_LABEL[leadData.incomeGoal] || leadData.incomeGoal || '';
             const thinker    = THINKER_LABEL[leadData.thinkerType] || leadData.thinkerType || '';
             const lowTime    = leadData.lowTimeFirstPick ? 'כן — סימן פחות משעה ביום בבחירה הראשונה' : 'לא';
-            const lastStage = _journey.last || restExtra.event_type || '';
+            const lastStage = jrFurthest() || _journey.last || restExtra.event_type || ''; // השלב הכי רחוק שהגיע אליו, לא האירוע האחרון
             const journeyHe = _journey.stages.map(s => STAGE_LABEL_HE[s] || s).join(' → ');
+            const jr = jrSnapshot(leadData);
             const summary = [
                 leadData.firstName ? 'שם: ' + leadData.firstName : null,
                 leadData.phone     ? 'טלפון: ' + leadData.phone : null,
@@ -722,8 +882,10 @@
                 'האם סימן פחות משעה: ' + lowTime,
                 leadData.whatsMissing ? 'מה חסר לו (מהטופס): ' + leadData.whatsMissing : null,
                 'שלב אחרון: ' + (STAGE_LABEL_HE[lastStage] || lastStage),
-                'מסע: ' + journeyHe
-            ].filter(Boolean).join('\n');
+                'מסע: ' + journeyHe,
+                '',
+                jr.journey_report_he
+            ].filter(x => x !== null && x !== undefined).join('\n');
             return {
                 ...leadData,
                 avatar: avatarHe,
@@ -739,6 +901,7 @@
                 funnel_journey_he: journeyHe,
                 profile_summary: summary,
                 submitted_at: new Date().toISOString(),
+                ...jr,
                 ...restExtra
             };
         }
@@ -1539,6 +1702,7 @@
             }, [stage]);
 
             const handleBridgeTransition = () => {
+                jrMark('bridge-open');
                 window.location.hash = '#/confirm';
                 setStage('bridge');
                 setBridgeRain(true);
@@ -1667,6 +1831,10 @@
 
             const ticketData = TRAINING_TICKET.avatars[avatarKey] || TRAINING_TICKET.avatars.beginner;
             const stopLabels = TRAINING_TICKET.stopLabels;
+
+            // הסרטון של ההדרכה: מפתח למדידת הצפייה + כתובת עם enablejsapi כדי שנוכל לדעת כמה צפה בפועל
+            const trainVidKey = (stage === 1 || stage === 'bridge') ? 'training1' : 'training2';
+            const trainVidSrc = `https://www.youtube.com/embed/${trainVidKey === 'training1' ? video1Id : video2Id}?autoplay=${stage === 'bridge' ? 0 : 1}&modestbranding=1&rel=0&showinfo=0&enablejsapi=1`;
 
             const requestFullscreen = () => setVideoFs(true);
             const exitFullscreen = () => setVideoFs(false);
@@ -2048,8 +2216,9 @@
                             <div style={{margin:'0 16px'}}>
                             <div className="video-wrapper">
                                 <iframe
-                                    ref={iframeRef}
-                                    src={`https://www.youtube.com/embed/${(stage === 1 || stage === 'bridge') ? video1Id : video2Id}?autoplay=${stage === 'bridge' ? 0 : 1}&modestbranding=1&rel=0&showinfo=0`}
+                                    key={trainVidSrc}
+                                    ref={el => { iframeRef.current = el; if (el) jrTrackVideo(el, trainVidKey); }}
+                                    src={trainVidSrc}
                                     frameBorder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                                     allowFullScreen
@@ -2063,7 +2232,7 @@
                             {videoFs && ReactDOM.createPortal(
                                 <div className="video-fs-overlay" onClick={exitFullscreen}>
                                     <button className="video-fs-close" onClick={exitFullscreen} aria-label="סגירה">✕</button>
-                                    <iframe src={`https://www.youtube.com/embed/${(stage === 1 || stage === 'bridge') ? video1Id : video2Id}?autoplay=1&modestbranding=1&rel=0`} frameBorder="0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen style={{width:'100%',height:'100%'}} />
+                                    <iframe ref={el => { if (el) jrTrackVideo(el, trainVidKey); }} src={`https://www.youtube.com/embed/${(stage === 1 || stage === 'bridge') ? video1Id : video2Id}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`} frameBorder="0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen style={{width:'100%',height:'100%'}} />
                                 </div>,
                                 document.body
                             )}
@@ -2907,6 +3076,7 @@
                     document.body.appendChild(s);
                 }
                 sendFunnelEvent('booking-view', { phone: leadData.phone || '', lead_id: leadData.lead_id || '', email: leadData.email || '', firstName: leadData.firstName || '', avatar: leadData.avatar || '' });
+                jrSendUpdate('reached_booking'); // שהמתאם יראה מיד שהליד הגיע לדף קביעת השיחה
             }, []);
             // ⏱️ מדידת זמן שהייה בדף קביעת השיחה — נשלח ל-GA4 ביציאה מהדף (עם lead_id + אווטאר לצורך הצלבה מול קביעה אמיתית ב-GHL)
             useEffect(() => {
@@ -3164,7 +3334,7 @@
 
             const prevHashRef = useRef(window.location.hash);
             const leadDataRef = useRef(leadData);
-            useEffect(() => { leadDataRef.current = leadData; }, [leadData]);
+            useEffect(() => { leadDataRef.current = leadData; JR.lead = leadData; }, [leadData]);
             useEffect(() => {
                 const onHashChange = () => {
                     const r = getHashRoute();
