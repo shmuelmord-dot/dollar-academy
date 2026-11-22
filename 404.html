@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dollar Academy</title>
+<script>
+  // כל נתיב לא קיים חוזר לדף הראשי, עם ה-UTM וה-hash (כמו שהאתר הישן התנהג)
+  var base = /github\.io$/.test(location.hostname) ? '/dollar-academy/' : '/';
+  location.replace(base + location.search + location.hash);
+</script>
+</head>
+<body style="background:#0A0D18"></body>
+</html>
