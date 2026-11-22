@@ -868,6 +868,25 @@
             const lastStage = jrFurthest() || _journey.last || restExtra.event_type || ''; // השלב הכי רחוק שהגיע אליו, לא האירוע האחרון
             const journeyHe = _journey.stages.map(s => STAGE_LABEL_HE[s] || s).join(' → ');
             const jr = jrSnapshot(leadData);
+            // כרטיס ליד מוכן להעתקה למתאם הפגישות — שדה אחד, קצר, בלי אימוג׳ים
+            const vidCard = (watch, dur, page) => (watch > 0 ? 'צפה ' + jrFmt(watch) + (dur ? ' מתוך ' + jrFmt(dur) : '') : 'לא הפעיל את הסרטון') + ', בדף ' + jrFmt(page) + ' דק׳';
+            const leadCard = [
+                'שם מלא: ' + (leadData.firstName || ''),
+                'סוג: ' + avatarHe,
+                'סגנון: ' + (leadData.characterTrait || ''),
+                leadData.age ? 'גיל: ' + leadData.age : null,
+                'מטרה: ' + incomeGoal,
+                'העדפה: ' + (leadData.workspacePreference || ''),
+                'זמן פנוי: ' + (leadData.weeklyTime || ''),
+                'חשיבה: ' + thinker,
+                'סימן פחות משעה: ' + (leadData.lowTimeFirstPick ? 'כן' : 'לא'),
+                leadData.whatsMissing ? 'מה חסר לו: ' + leadData.whatsMissing : null,
+                'שלב אחרון: ' + jr.journey_last_stage_he,
+                jr.quiz_duration_sec !== '' ? 'זמן שאלון: ' + jrFmt(jr.quiz_duration_sec) + ' דק׳' : null,
+                JR.t['training-view'] ? 'הדרכה 1: ' + vidCard(jr.training1_watch_sec, jr.training1_video_sec, jr.training1_page_sec) : null,
+                JR.t['advanced-view'] ? 'הדרכה 2: ' + vidCard(jr.training2_watch_sec, jr.training2_video_sec, jr.training2_page_sec) : null,
+                JR.t['booking-view'] ? 'דף קביעת שיחה: ' + jrFmt(jr.booking_page_sec) + ' דק׳' : null
+            ].filter(Boolean).join('\n');
             const summary = [
                 leadData.firstName ? 'שם: ' + leadData.firstName : null,
                 leadData.phone     ? 'טלפון: ' + leadData.phone : null,
@@ -900,6 +919,7 @@
                 funnel_journey: _journey.stages.join(' → '),
                 funnel_journey_he: journeyHe,
                 profile_summary: summary,
+                lead_card_he: leadCard,
                 submitted_at: new Date().toISOString(),
                 ...jr,
                 ...restExtra
