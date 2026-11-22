@@ -1219,7 +1219,7 @@
 
           return (
             <>
-            <section className="flex flex-col items-center gap-4" style={{ width:'100vw', marginInlineStart:'calc(50% - 50vw)', padding: mob ? '2.5rem 0' : '2.5rem 0' }}>
+            <section className="flex flex-col items-center gap-4" style={{ width:'100%', overflowX:'clip', padding:'2.5rem 0' }}>
               {/* title */}
               <div style={{ width:'100%', maxWidth:1240, padding: mob ? '0 20px' : '0 40px', display:'flex', flexDirection:'column', gap:12, alignItems:'center' }}>
                 <span style={{ fontFamily:'Rubik,sans-serif', fontWeight:700, fontSize: mob ? 14 : 15, letterSpacing:'.04em', color:'#4282FA' }}>03 · ישר מהוואטסאפ</span>
@@ -2231,7 +2231,7 @@
                 <div className="flex flex-col items-center w-full fade-enter fade-enter-active">
 
                     {/* ── Hero ── */}
-                    <div className="w-full" style={{minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'48px 20px'}}>
+                    <div className="w-full" style={{display:'flex',justifyContent:'center',padding:'24px 20px 48px'}}>
                         <div className="w-full max-w-[680px] flex flex-col items-center text-center space-y-6">
                             <h1 className="text-[32px] font-extrabold leading-[1.2] text-white m-0" style={{textWrap:'balance'}}>
                                 הדרך המוכחת לייצר <span style={{color:'#2E6BFF'}}>משכורת הייטק בדולרים</span> מהלפטופ, מכל מקום בעולם
@@ -2856,14 +2856,14 @@
             const frames = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             const [idx, setIdx] = useState(0);
             useEffect(() => {
-                frames.forEach(n => { const im = new Image(); im.src = `public/complain/${n}.webp?v=3`; });
+                frames.forEach(n => { const im = new Image(); im.src = `public/complain/${n}.webp?v=4`; });
                 const t = setInterval(() => setIdx(i => (i + 1) % frames.length), 2000);
                 return () => clearInterval(t);
             }, []);
             return (
                 <div className="relative w-full rounded-2xl overflow-hidden" style={{ aspectRatio: '600 / 458' }}>
                     {frames.map((n, k) => (
-                        <img key={n} src={`public/complain/${n}.webp?v=3`} alt="שחר ושמואל" className={`absolute inset-0 w-full h-full object-contain transition-opacity ease-in-out ${idx === k ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDuration: '800ms' }} loading="eager" />
+                        <img key={n} src={`public/complain/${n}.webp?v=4`} alt="שחר ושמואל" className={`absolute inset-0 w-full h-full object-contain transition-opacity ease-in-out ${idx === k ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDuration: '800ms' }} loading="eager" />
                     ))}
                 </div>
             );
